@@ -1,0 +1,37 @@
+
+FROM python:3.12-slim AS dev
+
+ENV PYTHONUNBUFFERED=1 PIP_ROOT_USER_ACTION=ignore PYTHONDONTWRITEBYTECODE=1
+
+
+# Outils nécessaires pour télécharger l'asset privé
+RUN apt-get update && apt-get install -y --no-install-recommends curl && apt-get install -y nano\
+    && rm -rf /var/lib/apt/lists/*\
+    && apt-get update && apt-get install -y \
+    default-libmysqlclient-dev \
+    build-essential \
+    pkg-config
+
+COPY FileDepot /app/FileDepot
+
+WORKDIR /app/FileDepot
+
+COPY django_tags_app-0.1.0-py3-none-any.whl /tmp/django_tags_app-0.1.0-py3-none-any.whl
+
+RUN set -euo pipefail \
+    && pip install --no-cache-dir -r /app/FileDepot/requirement.in \
+    && pip install --no-cache-dir /tmp/django_tags_app-0.1.0-py3-none-any.whl \
+    && rm -f /tmp/django_tags_app-0.1.0-py3-none-any.whl \
+    && find /app -type d -name "__pycache__" -exec rm -rf {} +
+
+
+# Dossier des logs (si nécessaire)
+RUN mkdir -p /app/save
+EXPOSE 5180 
+
+VOLUME ["/app/save"]
+
+# Django : bind sur 0.0.0.0 et log du jour
+#CMD ["bash","-lc","python manage.py runserver 0.0.0.0:PORT | tee -a ./save/$(date +'%Y-%m-%d')_trace.log"]
+CMD ["bash","-lc","python manage.py makemigrations && python manage.py migrate && python manage.py shell < init_data.py && python manage.py runserver 0.0.0.0:5180 | tee -a ./save/$(date +'%Y-%m-%d')_trace.log"]
+

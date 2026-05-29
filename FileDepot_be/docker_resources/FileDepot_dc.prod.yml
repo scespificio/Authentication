@@ -1,0 +1,76 @@
+# docker compose -f /home/adminroot/services/run/FileDepot_dc.dev.yml -p file_depot up --build
+# copy model migrations : docker cp filedepot_be_dev:/app/FileDepot/core/migrations ../FileDepot/core/
+# copy new npm installs : docker cp filedepot_fe_dev:/app/package-lock.json /home/adminroot/workspace/FileDepot/FileDepot_fe/FileDepot_FE/
+name: filedepot
+volumes:
+  FileDepot_db:
+    external: true
+
+networks:
+  filedepot_net:
+    name : filedepot_net
+    external: false
+
+services:
+  db:
+    image: mysql:latest
+    container_name: FileDepot_db-container
+    env_file:
+      - /home/adminroot/services/env/FileDepot.env.dev
+    networks:
+      - filedepot_net
+    volumes:
+      - FileDepot_db:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  filedepot-redis-broker:
+    image: redis:7-alpine
+    container_name: filedepot-redis-broker
+    networks:
+      - filedepot_net
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  filedep_be_dev:
+    build:
+      context: /home/adminroot/workspace/FileDepot/FileDepot_be/..
+      dockerfile: docker_resources/Dockerfile.dev
+      target: dev
+    image: csbe:latest
+    container_name: filedep_be_dev
+    env_file:
+      - .env.dev
+    networks:
+      - filedepot_net
+    ports:
+      - "5180:5180"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Worker Celery pour exécuter les tâches
+  worker:
+    image: csbe:latest
+    container_name: filedep-worker
+    env_file:
+      - .env.dev
+    networks:
+      - filedepot_net
+    working_dir: /app/FileDepot
+    depends_on:
+      db:
+        condition: service_healthy
+      filedepot-redis-broker:
+        condition: service_healthy
+    command: celery -A FileDepot worker -l info
+    restart: unless-stopped

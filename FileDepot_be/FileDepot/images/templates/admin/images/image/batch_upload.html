@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_urls %}
+
+{% block content %}
+
+  <div class="module">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <fieldset class="module aligned">
+
+        {# Affiche tous les champs SAUF 'files' ici #}
+        {% for field in form %}
+          {% if field.name != 'files' %}
+            <div class="form-row">
+              {{ field.label_tag }}
+              {{ field }}
+              {% if field.help_text %}<p class="help">{{ field.help_text }}</p>{% endif %}
+              {{ field.errors }}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+      </fieldset>
+
+      <div class="submit-row">
+        <a class="button" href="{% url opts|admin_urlname:'changelist' %}">Annuler</a>
+
+        
+        {# 👉 Le widget admin (input file) à la place du bouton Importer #}
+        <div class="form-row" style="margin:0;">
+          {{ form.files.label_tag }}
+          {{ form.files }}
+          {% if form.files.help_text %}<p class="help">{{ form.files.help_text }}</p>{% endif %}
+          {{ form.files.errors }}
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    (function() {
+      var input = document.getElementById('id_files'); // id par défaut du champ
+      if (!input) return;
+      input.addEventListener('change', function () {
+        if (input.files && input.files.length > 0) {
+          input.form.submit(); // soumission auto dès sélection
+        }
+      });
+    })();
+  </script>
+  {% endblock %}
+
+

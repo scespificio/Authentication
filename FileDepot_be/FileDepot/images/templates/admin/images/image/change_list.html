@@ -1,0 +1,12 @@
+{# templates/admin/<app_label>/<model_name>/change_list.html #}
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+  {{ block.super }}
+  <li>
+    <a class="addlink"
+       href="{% url 'admin:images_image_batch_upload' %}">
+       Import en lot
+    </a>
+  </li>
+{% endblock %}

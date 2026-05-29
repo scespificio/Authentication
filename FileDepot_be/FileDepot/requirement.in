@@ -1,0 +1,13 @@
+django
+django-debug-toolbar
+django-filter
+djangorestframework
+django-cors-headers
+djoser
+mysqlclient
+Pillow
+celery>=5.3
+redis>=5.0
+gunicorn
+whitenoise
+dotenv
