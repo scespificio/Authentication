@@ -54,22 +54,13 @@ export default function HomePage() {
     } catch (error) {
       if (error instanceof AxiosError) {
         switch (error.status) {
-          case 401:
-            setError("401: UNAUTHORIZED")
-            break;
-          case 400:
-            setError("400: BAD REQUEST")
-            break;
-          case 500:
-            setError("SERVER ERROR")
-            break;
           default:
-            setError(`Une erreur est survenue (${error.status || error.code})`);
+            setError(`Une erreur est survenue (${error.status}) : ${error.code} ${error.response.data.message}`);
+            console.log(error)
         }
 
       }
     }
-
   };
 
   const handleEmpty = () => {
@@ -87,10 +78,7 @@ export default function HomePage() {
             </Heading>
           </Box>
         </Flex>
-        <DragDrop file={file} handleChange={handleChange} handleEmpty={handleEmpty} handleSubmit={handleSubmit} />
-        {
-          error && <><Text>{error}</Text></>
-        }
+        <DragDrop file={file} error={error} handleChange={handleChange} handleEmpty={handleEmpty} handleSubmit={handleSubmit} />
       </Box>
     </Page>
   );

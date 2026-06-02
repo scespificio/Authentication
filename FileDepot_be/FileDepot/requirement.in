@@ -4,6 +4,7 @@ django-filter
 djangorestframework
 django-cors-headers
 djoser
+django-clamd
 mysqlclient
 Pillow
 celery>=5.3

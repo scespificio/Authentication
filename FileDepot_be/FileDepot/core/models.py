@@ -126,11 +126,12 @@ class WebConfig(models.Model):
         return f"{self.name}"
 
 class Fichier(models.Model):
-    utilisateur = models.ForeignKey(User, verbose_name="Utilisateur déposant")
-    nom = models.CharField(verbose_name="Nom", max_length=100)
+    utilisateur = models.ForeignKey(User, verbose_name="Utilisateur déposant", blank=True, null=True, on_delete=models.SET_NULL)
+    nom = models.CharField(verbose_name="Nom", max_length=100, unique=True)
     date_creation = models.DateField(verbose_name="Date de création", default=dt.today, help_text="Format dd/mm/yyyy")
     horodatage_creation = models.TimeField(verbose_name="Heure de création", auto_now_add=True, help_text="Format HH:MM")
     chemin = models.TextField(verbose_name="Chemin système")
+    chemin_destinataire = models.TextField(verbose_name="Chemin système chez le client", blank=True, null=True)
     
     class Meta:
         ordering = ["date_creation"]

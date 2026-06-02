@@ -22,6 +22,7 @@ from django.core.cache import cache
 from .models import WebConfig, Fichier
 from .serializers import WebConfigOutputSerializer, CustomTokenObtainPairSerializer, FichierSerializer
 from djoser.serializers import ActivationSerializer as DJActivationSerializer, SendEmailResetSerializer
+from django_clamd.validators import validate_file_infection
 import logging
 logger = logging.getLogger(__name__)
 
@@ -37,9 +38,10 @@ from core.emails import ActivationEmail, PasswordResetEmail
 from urllib.parse import urljoin
 import djoser, inspect
 import os
+import datetime as dt
 
 FILE_STORAGE_PATH = os.getenv("FILE_STORAGE_PATH")
-FILE_LIMIT_SIZE = int(os.getenv("FILE_LIMIT_SIZE")) * 1024 * 1024
+FILE_SIZE_LIMIT = int(os.getenv("FILE_SIZE_LIMIT")) * 1024 * 1024
 
 @api_view(["GET"])
 def home(request):
@@ -86,7 +88,6 @@ def get_user_from_uid_token(uid: str, token: str):
     # Vérifie la validité du token
     is_valid = default_token_generator.check_token(user, token)
     return user, is_valid
-
 
 class ActivationView(APIView):
     permission_classes = [AllowAny]  # l’activation est anonyme
@@ -158,7 +159,6 @@ class ActivationResendView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
-
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
 
@@ -185,35 +185,50 @@ class FichierView(GenericAPIView): # GET ALL & POST
     serializer_class = FichierSerializer
     queryset = Fichier.objects.all()
 
-    def get(self, request):
-        obj = self.get_queryset() # L'utilisateur peut voir tous les fichiers (TEMPORAIRE)
+    def get(self, request): # L'utilisateur peut voir tous les fichiers (TEMPORAIRE)
+        obj = self.get_queryset() 
         return Response(self.get_serializer(obj, many=True).data, status=status.HTTP_200_OK)
        
     def post(self, request):
-            uploaded_file = request.FILES["fichier"]
-            file_name = uploaded_file.name
-            file_path = os.path.join(FILE_STORAGE_PATH, file_name)
-            file_data = uploaded_file.read()
-
-            user = User.objects.filter(email = request.user).first()
-
+    
+            user = User.objects.filter(email = request.user.email)
+            
             try:
-                serializer = self.get_serializer(data={"nom":file_name, "chemin":file_path})
-                serializer.is_valid(raise_exception=True)
-                serializer.save(utilisateur = user, nom = file_name, chemin = file_path)
+                uploaded_file = request.FILES["fichier"] # Read the file from the request
+                file_name = uploaded_file.name
 
-                with open(file_path, 'wb') as file:
+                # Create the new filename from user, datetime and the former filename
+                now = dt.datetime.now()
+                formatted_date = now.strftime("%Y-%m-%d_%H;%M")
+                file_name_storage = str(request.user) + "_" + formatted_date + "_" + file_name
+                file_path = os.path.join(FILE_STORAGE_PATH, file_name_storage) # create file path on volume
+
+                # Validate data, valid file size and scan for corruption or malwares
+                serializer = self.get_serializer(data={"utilisateur":request.user.email, "nom":file_name, "chemin":file_path}) 
+                serializer.is_valid(raise_exception=True)
+
+                if uploaded_file.size > FILE_SIZE_LIMIT:
+                    raise ValidationError(f"File size is too heavy. Please retry with a file smaller than {FILE_SIZE_LIMIT} MB.")
+                
+                file_data = uploaded_file.read()
+                uploaded_file.seek(0) # Reset the cursor at the beginning of the file
+                validate_file_infection(uploaded_file)
+
+                serializer.save(utilisateur=user, nom=file_name_storage, chemin=file_path) # Save file metadata
+
+                with open(file_path, 'wb') as file: # Write file on volume
                     file.write(file_data)
 
             except ValidationError as e:
-                print("Error during validation: ", e)
+                error = str(e)
+                return Response({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class FichierDetailView(GenericAPIView): # GET ONE
     serializer_class = FichierSerializer
     queryset = Fichier.objects.all()
-
-    def get(self, request, file_slug):
+ 
+    def get(self, request, file_slug): # L'utilisateur peut voir n'importe quel fichier (TEMPORAIRE)
         obj = self.get_queryset().filter(nom=file_slug)
         return Response(self.get_serializer(obj, many=True).data, status=status.HTTP_200_OK)

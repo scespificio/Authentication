@@ -5,11 +5,12 @@ import { Box, Text, Button, Flex } from "@chakra-ui/react";
 
 interface Props {
     file: Blob,
+    error: string,
     handleChange: (file) => void,
     handleSubmit: (file) => void,
     handleEmpty: () => void
 }
-const DragDrop = ({ file, handleChange, handleSubmit, handleEmpty }: Props) => {
+const DragDrop = ({ file, error, handleChange, handleSubmit, handleEmpty }: Props) => {
 
     const fileTypes = ["TXT", "PDF"];
 
@@ -20,14 +21,21 @@ const DragDrop = ({ file, handleChange, handleSubmit, handleEmpty }: Props) => {
                     Déposez (ou faites glisser) un fichier.
                 </Text>
                 <FileUploader handleChange={handleChange} name="file" label="Chargez ou déposez un fichier ici" uploadedLabel="Fichier chargé avec succès." hoverTitle="Déposer ici" types={fileTypes} />
-                <Flex justify="space-between" align="stretch" gap={5} mt={4}>
+                <Flex justify="space-between" align="stretch" gap={5} mt={4} mb={4}>
                     {file &&
                         <>
                             <Button colorPalette="red" onClick={handleEmpty}>Vider</Button>
                             <Button onClick={handleSubmit}>Déposer</Button>
                         </>
                     }
+
                 </Flex>
+                {
+                    error &&
+                    <>
+                        <Text fontWeight="bold" color="red">{error}</Text>
+                    </>
+                }
             </Box>
         </>
     )

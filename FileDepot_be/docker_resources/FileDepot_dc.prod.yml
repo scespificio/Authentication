@@ -1,5 +1,5 @@
 # docker compose -f /home/adminroot/services/run/FileDepot_dc.dev.yml -p file_depot up --build
-# copy model migrations : docker cp filedepot_be_dev:/app/FileDepot/core/migrations ../FileDepot/core/
+# copy model migrations : docker cp filedepot_be_dev:/app/FileDepot/core/migrations /home/adminroot/workspace/FileDepot/FileDepot_be/FileDepot/core/
 # copy new npm installs : docker cp filedepot_fe_dev:/app/package-lock.json /home/adminroot/workspace/FileDepot/FileDepot_fe/FileDepot_FE/
 name: filedepot
 volumes:

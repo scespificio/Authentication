@@ -83,9 +83,9 @@ class WebConfigOutputSerializer(ModelSerializer):
         return url
 
 class FichierSerializer(ModelSerializer):
-    utilisateur = CharField(source="user.email")
+    utilisateur = CharField(source='utilisateur.email')
 
     class Meta:
         model = Fichier
-        fields = ("id", "utilisateur", "nom", "date_creation", "horodatage_creation", "chemin")
+        fields = ("id", "utilisateur", "nom", "date_creation", "horodatage_creation", "chemin", "chemin_destinataire")
         read_only_fields = ["id", "date_creation", "horodatage_creation"]

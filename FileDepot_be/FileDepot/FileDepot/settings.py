@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'images.apps.ImagesConfig',
     'core.apps.CoreConfig',
     'debug_toolbar',
-    "djoser"
+    "djoser",
+    'django_clamd'
 ]
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
