@@ -20,9 +20,6 @@ export default function HomePage() {
     async function fetchData() {
       try {
         if (!ignore) {
-          setLoading(true);
-        }
-        if (!ignore) {
           setLoading(false);
         }
       } catch (error) {
@@ -54,9 +51,12 @@ export default function HomePage() {
     } catch (error) {
       if (error instanceof AxiosError) {
         switch (error.status) {
+          case 401:
+            tokenRefresh();
+            break;
           default:
-            setError(`Une erreur est survenue (${error.status}) : ${error.code} ${error.response.data.message}`);
-            console.log(error)
+            setError(`Une erreur est survenue (${error.status}) : ${error.response.data.message[0]}`);
+            break;
         }
 
       }

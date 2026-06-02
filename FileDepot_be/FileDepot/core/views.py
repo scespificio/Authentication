@@ -41,7 +41,7 @@ import os
 import datetime as dt
 
 FILE_STORAGE_PATH = os.getenv("FILE_STORAGE_PATH")
-FILE_SIZE_LIMIT = int(os.getenv("FILE_SIZE_LIMIT")) * 1024 * 1024
+FILE_SIZE_LIMIT = int(os.getenv("FILE_SIZE_LIMIT"))
 
 @api_view(["GET"])
 def home(request):
@@ -191,7 +191,7 @@ class FichierView(GenericAPIView): # GET ALL & POST
        
     def post(self, request):
     
-            user = User.objects.filter(email = request.user.email)
+            user = User.objects.filter(email = request.user.email).first()
             
             try:
                 uploaded_file = request.FILES["fichier"] # Read the file from the request
@@ -207,12 +207,12 @@ class FichierView(GenericAPIView): # GET ALL & POST
                 serializer = self.get_serializer(data={"utilisateur":request.user.email, "nom":file_name, "chemin":file_path}) 
                 serializer.is_valid(raise_exception=True)
 
-                if uploaded_file.size > FILE_SIZE_LIMIT:
-                    raise ValidationError(f"File size is too heavy. Please retry with a file smaller than {FILE_SIZE_LIMIT} MB.")
+                if uploaded_file.size > FILE_SIZE_LIMIT * 1024 * 1024:
+                    raise ValidationError([f"File size is too heavy. Please retry with a file smaller than {FILE_SIZE_LIMIT} MB."])
                 
                 file_data = uploaded_file.read()
                 uploaded_file.seek(0) # Reset the cursor at the beginning of the file
-                validate_file_infection(uploaded_file)
+                #validate_file_infection(uploaded_file)
 
                 serializer.save(utilisateur=user, nom=file_name_storage, chemin=file_path) # Save file metadata
 
@@ -220,8 +220,7 @@ class FichierView(GenericAPIView): # GET ALL & POST
                     file.write(file_data)
 
             except ValidationError as e:
-                error = str(e)
-                return Response({"message": error}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
