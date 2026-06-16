@@ -1,0 +1,35 @@
+#docker compose -f docker-compose.prod.yml up --build
+
+networks:
+  mynetwork:
+    external: false
+
+services:
+  authenticate_fe_prod:
+    build:
+      context: ..
+      dockerfile: docker_resources/Dockerfile
+      args:
+        # On dit à Docker : "prends les valeurs définies dans l'environnement Docker Compose"
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
+        VITE_BACKEND_TIMEOUT: ${VITE_BACKEND_TIMEOUT}
+
+    image: authenticate_fe:v1
+    container_name: authenticate_fe_prod
+
+    # On utilise les mêmes variables aussi au runtime si besoin
+    env_file:
+      - .env.prod
+
+    # Nginx interne écoute sur PORT, on le mappe sur PORT côté host
+    # Placeholder ports nginx & frontend prod
+    ports:
+      - "PORT:PORT"
+
+    networks:
+      - mynetwork
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    restart: unless-stopped

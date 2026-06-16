@@ -1,0 +1,28 @@
+#docker compose -f docker-compose.dev.yml up --build
+
+networks:
+  authenticate_net:
+    external: false
+
+services:
+  authenticate_fe_dev:
+    build:
+      context: /home/adminroot/workspace/Authenticate/Authenticate_fe/Authenticate_FE/
+      dockerfile: docker_resources/Dockerfile
+      target: dev
+    image: authenticate_fe:dev
+    container_name: authenticate_fe_dev
+    ports:
+      - "5193:5193"
+    env_file:
+      - /home/adminroot/workspace/services/env/Authenticate.env.dev
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - /home/adminroot/workspace/Authenticate/Authenticate_fe/Authenticate_FE/:/app
+      - /app/node_modules
+    networks:
+      - authenticate_net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

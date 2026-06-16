@@ -1,0 +1,76 @@
+# docker compose -f /home/adminroot/services/run/Authenticate_dc.dev.yml -p authenticate up --build
+# copy model migrations : docker cp authenticate_be_dev:/app/Authenticate/user/migrations /home/adminroot/workspace/Authenticate/Authenticate_be/Authenticate/user/
+# copy new npm installs : docker cp authenticate_fe_dev:/app/package-lock.json /home/adminroot/workspace/Authenticate/Authenticate_fe/Authenticate_FE/
+name: authenticate
+volumes:
+  Authenticate_db:
+    external: true
+
+networks:
+  authenticate_net:
+    name : authenticate_net
+    external: false
+
+services:
+  db:
+    image: mysql:latest
+    container_name: Authenticate_db-container
+    env_file:
+      - /home/adminroot/services/env/Authenticate.env.dev
+    networks:
+      - authenticate_net
+    volumes:
+      - Authenticate_db:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  authenticate-redis-broker:
+    image: redis:7-alpine
+    container_name: authenticate-redis-broker
+    networks:
+      - authenticate_net
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  filedep_be_dev:
+    build:
+      context: /home/adminroot/workspace/Authenticate/Authenticate_be/..
+      dockerfile: docker_resources/Dockerfile.dev
+      target: dev
+    image: csbe:latest
+    container_name: filedep_be_dev
+    env_file:
+      - .env.dev
+    networks:
+      - authenticate_net
+    ports:
+      - "5190:5190"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Worker Celery pour exécuter les tâches
+  worker:
+    image: csbe:latest
+    container_name: filedep-worker
+    env_file:
+      - .env.dev
+    networks:
+      - authenticate_net
+    working_dir: /app/Authenticate
+    depends_on:
+      db:
+        condition: service_healthy
+      authenticate-redis-broker:
+        condition: service_healthy
+    command: celery -A Authenticate worker -l info
+    restart: unless-stopped
