@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'tags.apps.TagsConfig',
     'users.apps.UsersConfig',
     'debug_toolbar',
-    'djoser'
+    'djoser',
+    'core.apps.CoreConfig'
 ]
 
 MIDDLEWARE = [

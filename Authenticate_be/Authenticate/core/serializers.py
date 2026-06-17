@@ -8,16 +8,16 @@ class ProfileSerializer(ModelSerializer):
 
     class Meta:
         model = Profil
-        fields = ['id', 'utilisateur_nom', 'société_nom', 'nom']
+        fields = ['utilisateur_nom', 'société_nom', 'nom']
 
 class CompanySerializer(ModelSerializer):
     class Meta:
         model = Société
-        fields = ['id', 'nom']
+        fields = ['nom']
 
 class DomainSerializer(ModelSerializer):
     société_nom = ReadOnlyField(source="Société.nom")
 
     class Meta:
         model = Domaine
-        fields = ['id', 'société_nom', 'nom', 'domaine']
+        fields = ['société_nom', 'nom', 'url']

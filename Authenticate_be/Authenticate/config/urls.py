@@ -31,6 +31,7 @@ admin.site.index_title = 'Administration'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
+    path('core/', include('core.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
 
     # --- Tes overrides D'ABORD ---

@@ -1,11 +1,13 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import ProfileSerializer, CompanySerializer, DomainSerializer
+from . import views
 
 app_name = 'core'
 
 urlpatterns = [
-    path('profil/', ProfileSerializer.as_view(), name='profil'),
-    path('société/', CompanySerializer.as_view(), name='société'),
-    path('domaine/', DomainSerializer.as_view(), name='domaine')
+    path('profil/', views.ProfileView.as_view(), name='profil'),
+    path('profil/me/', views.ProfileViewDetail.as_view(), name='profil-me'),
+    path('societe/', views.CompanyView.as_view(), name='société'),
+    path('societe/me', views.CompanyViewDetail.as_view(), name='société-me'),
+    path('domaine/', views.DomainView.as_view(), name='domaine')
 ]

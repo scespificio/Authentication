@@ -15,23 +15,25 @@ User = get_user_model()
 def create_superuser():
     if User.objects.filter(email='admin@espificio.com').exists():
         print("Superuser already exists")
-        return
+        return User.objects.get(email='admin@espificio.com')
+    
     superuser = User.objects.create_superuser(
         email='admin@espificio.com',
         password='espificio',
         first_name='Admin',
         last_name='User'
     )
+    
     print(f"Created superuser: {superuser.email}")
     return superuser
 
 def create_company():
     if Société.objects.filter(nom='Espificio').exists():
         print("Company already exists.")
-        return
+        return Société.objects.get(nom='Espificio')
     
-    company = Société.objects.get_or_create(
-        nom='espificio'
+    company, _ = Société.objects.get_or_create(
+        nom='Espificio'
     )
 
     print("Created company ", company.nom)
@@ -42,10 +44,10 @@ def create_profile(superuser, company):
         print("Profile already exists.")
         return
 
-    profile = Profil.objects.get_or_create(
+    profile, _ = Profil.objects.get_or_create(
         utilisateur = superuser,
         société = company,
-        nom='espificio'
+        nom='admin'
     )
 
     print("Created profile ", profile.nom)
@@ -55,7 +57,7 @@ def create_domain(company):
         print("Domain already exists.")
         return
     
-    domain = Domaine.objects.get_or_create(
+    domain, _ = Domaine.objects.get_or_create(
         société = company,
         nom='CRAOnline',
         url='craonline.espificio.com'

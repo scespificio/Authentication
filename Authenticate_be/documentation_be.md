@@ -162,4 +162,4 @@ Ports connus (README):
 ## Tests
 
 - Fichiers `tests.py` existent dans `users` et `images` mais contiennent uniquement des squelettes (pas de tests definis).
-- Fichier `init_data.py` existe dans `users` pour directement créer des données test lors de l'initialisation du projet // A SUPPRIMER OU MODIFIER PAR SECURITE 
+- Fichier `init_data.py` existe dans `Authenticate` pour directement créer des données test lors de l'initialisation du projet // A SUPPRIMER OU MODIFIER PAR SECURITE 
