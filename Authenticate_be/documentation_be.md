@@ -12,7 +12,7 @@ Ce document décrit le code present dans `Authenticate_be`. Il couvre l'architec
 
 ## Arborescence utile
 
-- `Authenticate/config/` : configuration Django (settings, urls, wsgi/asgi, celery).
+- `Authenticate/theme/` : configuration Django (settings, urls, wsgi/asgi, celery).
 - `Authenticate/core/` : gestion des profils & sites (profil, société, domaine).
 - `Authenticate/users/` : gestion des utilisateurs, authentification et envoi d'emails (utilisateurs, email).
 - `Authenticate/images/` : gestion des images, admin, upload en lot.
@@ -64,9 +64,9 @@ Endpoints core (`Authenticate/core/urls.py`):
 
 ### Models (`Authenticate/core/models.py`)
 
-- `Domaine`: . Champs: 
-- `Profil`: . Champs: 
-- `Société`: . Champs: 
+- `Société`: . Champs: `nom`
+- `Profil`: . Champs:  `nom`, `utilisateur` (FK vers `User`), `société` (FK vers `Société`)
+- `Domaine`: . Champs: `nom`, `url`, `société` (FK vers `Société`)
 
 ### Serializers (`Authenticate/core/serializers.py`)
 
