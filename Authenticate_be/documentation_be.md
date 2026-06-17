@@ -6,15 +6,17 @@ Ce document décrit le code present dans `Authenticate_be`. Il couvre l'architec
 
 - Projet Django REST (DRF) avec authentification JWT (SimpleJWT) et Djoser.
 - Base de donnees MySQL, cache/broker Redis, emails SMTP, taches async via Celery.
-- Deux apps locales principales: `users` et `images`.
+- Deux apps locales principales: `core` et `images`.
 - App `tags` externe (fournie par le wheel `django_tags_app-0.1.0-py3-none-any.whl`) utilisee via `tags.models.TaggedItem` et `tags.admin.TagsInline`.
+- App `users` externe (fournie par le wheel `django_users_apps-0.1.0-py3-none-any.whl`) utilisee via `users.models.User`, `users.serializers`, `users.views`, `users.emails` et `users.urls`.
 
 ## Arborescence utile
 
 - `Authenticate/config/` : configuration Django (settings, urls, wsgi/asgi, celery).
-- `Authenticate/users/` : gestion des utilisateurs (utilisateurs, config, email).
+- `Authenticate/core/` : gestion des profils & sites (profil, société, domaine).
+- `Authenticate/users/` : gestion des utilisateurs, authentification et envoi d'emails (utilisateurs, email).
 - `Authenticate/images/` : gestion des images, admin, upload en lot.
-- `docker_resources/docker-compose.dev.yml` / `docker_resources/docker-compose.prod.yml` : infra locale/prod.
+- `docker_resources/Authenticate_dc.prod.yml` : infra locale/prod.
 - `docker_resources/Dockerfile.dev` / `docker_resources/Dockerfile.prod` : build images.
 
 ## Configuration Django (Authenticate)
@@ -36,6 +38,7 @@ Variables d'environnement (principales):
 - CORS: `CORS_ALLOWED_ORIGINS`
 - DB: `DB_NAME`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`
 - Email: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT`
+- Config : `CONFIG_FILE_FOLDER`, `CONFIG_FILE_NAME`
 - Front: `FRONTEND_BASE_URL`, `FRONTEND_DOMAIN`, `FRONTEND_PROTOCOL`
 - JWT: `ACCESS_TOKEN_LIFETIME`, `REFRESH_TOKEN_LIFETIME`
 - Celery: `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`
@@ -48,7 +51,8 @@ URLConf actif (celui reference dans settings): `Authenticate/config/urls.py`
 Routes principales:
 
 - Admin: `/admin/`
-- users API: `/users/` (voir `Authenticate/users/urls.py`)
+- core API: `/users/` (voir `Authenticate/core/urls.py`)
+- users API: `/users/`
 - Auth Djoser: `/auth/`
 - Activation custom:
   - `POST /auth/users/activation/` -> `users.views.ActivationView`
@@ -56,11 +60,35 @@ Routes principales:
 - Debug toolbar: `/__debug__/` (en dev)
 - Media: expose en dev via `static()` si `DEBUG=True`
 
-Endpoints users (`Authenticate/users/urls.py`):
+Endpoints core (`Authenticate/core/urls.py`):
 
-- `GET /users/home/` : ping simple.
-- `POST /users/auth/jwt/create` : login JWT custom (renvoie users + tokens).
-- `GET /users/config/me/` : config liée a l'utilisateur courant.
+### Models (`Authenticate/core/models.py`)
+
+- `Domaine`: . Champs: 
+- `Profil`: . Champs: 
+- `Société`: . Champs: 
+
+### Serializers (`Authenticate/core/serializers.py`)
+
+- `CompanySerializer`: informations de base sur la société.
+- `DomainSerializer`: informations de base sur le domaine.
+- `ProfileSerializer`: informations de base sur le profil utilisateur.
+
+### Views (`Authenticate/core/views.py`)
+
+- `CompanyView`: renvoie les informations sur toutes les sociétés enregistrées.
+- `CompanyViewDetail`: renvoie les informations sur la société associée à l'utilisateur actuellement connecté.
+- `ProfileView`: renvoie les informations sur tous les utilisateurs.
+- `ProfileViewDetail`: renvoie les informations sur le profil utilisateur associé à l'utilisateur actuellement connecté.
+- `DomainView`: renvoie les informations sur les domaines associés à la société de l'utilisateur actuellement connecté.
+
+### Admin (`Authenticate/core/admin.py`)
+
+- Admin `Société`
+- Admin `Profil`
+- Admin `Domaine`
+
+## App `users`
 
 ### Models (`Authenticate/users/models.py`)
 
@@ -143,8 +171,7 @@ Fichier: `Authenticate/config/celery.py`
 Fichiers principaux:
 
 - `docker_resources/Dockerfile.dev` / `docker_resources/Dockerfile.prod`: builds Django + dependencies.
-- `docker_resources/docker-compose.dev.yml`: services MySQL, Redis, SMTP, backend, worker.
-- `docker_resources/docker-compose.prod.yml`: idem + Nginx media en front d'uploads.
+- `docker_resources/Authenticate_dc.prod.yml`: services MySQL, Redis, SMTP, backend, worker.
 - `nginx-media.conf`: expose `/uploads` via Nginx (port 871 en prod).
 - `prodentrypoint.sh`: entrypoint prod.
 
@@ -161,5 +188,5 @@ Ports connus (README):
 
 ## Tests
 
-- Fichiers `tests.py` existent dans `users` et `images` mais contiennent uniquement des squelettes (pas de tests definis).
+- Fichiers `tests.py` existent dans `core` et `images` mais contiennent uniquement des squelettes (pas de tests definis).
 - Fichier `init_data.py` existe dans `Authenticate` pour directement créer des données test lors de l'initialisation du projet // A SUPPRIMER OU MODIFIER PAR SECURITE 
