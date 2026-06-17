@@ -20,7 +20,7 @@ import debug_toolbar
 import djoser
 from django.conf import settings
 from django.conf.urls.static import static
-from user.views import ActivationView, ActivationResendView
+from users.views import ActivationView, ActivationResendView
 from django.views.generic import TemplateView
 
 
@@ -30,7 +30,7 @@ admin.site.index_title = 'Administration'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/', include('user.urls')),
+    path('users/', include('users.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
 
     # --- Tes overrides D'ABORD ---

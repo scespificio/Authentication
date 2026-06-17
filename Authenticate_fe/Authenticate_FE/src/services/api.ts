@@ -20,7 +20,7 @@ export class ApiService {
                 const isAuthEndpoint =
                     url.startsWith("/auth/jwt/refresh/") ||
                     url.startsWith("/auth/jwt/create/") ||
-                    url.startsWith("/user/auth/jwt/create");
+                    url.startsWith("/users/auth/jwt/create");
 
                 if (!isAuthEndpoint && this.#user?.access_token) {
                     config.headers = config.headers ?? {};
@@ -47,7 +47,7 @@ export class ApiService {
         this.#user = user;
     }
     async login(email: string, password: string): Promise<UserData> {
-        const response = await this.#axiosInstance.post<UserData>("/user/auth/jwt/create/", {
+        const response = await this.#axiosInstance.post<UserData>("/users/auth/jwt/create/", {
             "email": email,
             "password": password
         });
@@ -78,7 +78,7 @@ export class ApiService {
         }
     }
     async getConfig(): Promise<ConfigData> {
-        const response = await this.#axiosInstance.get("/user/config/me/");
+        const response = await this.#axiosInstance.get("/users/config/me/");
         return response.data;
     }
     async postActivation(uid: string, token: string) {
@@ -95,21 +95,6 @@ export class ApiService {
     }
     async postPasswordForgotten(email: string) {
         const response = await this.#axiosInstance.post("/auth/users/reset_password/", { "email": email });
-        return response.data;
-    }
-    // Endpoints fichiers
-    async postFileUpload(file: Blob) {
-        const formData = new FormData();
-        formData.append("fichier", file, (file as File).name);
-        console.log("FORM DATA", formData)
-        const response = await this.#axiosInstance.post(
-            "/user/files/",
-            formData,
-            {
-                headers:
-                    { "Content-Type": "multipart/form-data" }
-            }
-        );
         return response.data;
     }
 }

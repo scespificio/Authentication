@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1 PIP_ROOT_USER_ACTION=ignore PYTHONDONTWRITEBYTECODE=1
 
 
 # Outils nécessaires pour télécharger l'asset privé
-RUN apt-get update && apt-get install -y --no-install-recommends curl && apt-get install -y nano && apt-get install -y clamav-daemon\
+RUN apt-get update && apt-get install -y --no-install-recommends curl && apt-get install -y nano \
     && rm -rf /var/lib/apt/lists/*\
     && apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
@@ -17,13 +17,15 @@ COPY Authenticate /app/Authenticate
 WORKDIR /app/Authenticate
 
 COPY django_tags_app-0.1.0-py3-none-any.whl /tmp/django_tags_app-0.1.0-py3-none-any.whl
+COPY django_users_apps-0.1.0-py3-none-any.whl /tmp/django_users_apps-0.1.0-py3-none-any.whl
 
 RUN set -euo pipefail \
     && pip install --no-cache-dir -r /app/Authenticate/requirement.in \
     && pip install --no-cache-dir /tmp/django_tags_app-0.1.0-py3-none-any.whl \
     && rm -f /tmp/django_tags_app-0.1.0-py3-none-any.whl \
+    && pip install --no-cache-dir /tmp/django_users_apps-0.1.0-py3-none-any.whl \
+    && rm -f /tmp/django_users_apps-0.1.0-py3-none-any.whl \
     && find /app -type d -name "__pycache__" -exec rm -rf {} +
-
 
 # Dossier des logs (si nécessaire)
 RUN mkdir -p /app/save

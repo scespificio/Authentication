@@ -56,11 +56,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'images.apps.ImagesConfig',
     'tags.apps.TagsConfig',
-    'user.apps.userConfig',
+    'users.apps.UsersConfig',
     'debug_toolbar',
-    "djoser",
-    'django_clamd'
+    'djoser'
 ]
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -94,7 +94,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 "django.template.context_processors.media",
-                'user.context_processors.frontend_base_url',
+                'users.context_processors.frontend_base_url',
             ],
         },
     },
@@ -157,7 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = "user.User"
+AUTH_USER_MODEL = "users.User"
 # Static files (CSS, JS, images)
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"   # dossier où collectstatic va tout mettre
@@ -184,12 +184,12 @@ DJOSER = {
     "PASSWORD_RESET_CONFIRM_URL": "auth/reset-password/{uid}/{token}",
     "DOMAIN": os.getenv("FRONTEND_DOMAIN"),
     "SITE_NAME": "Authenticate",
-    "EMAIL": {"activation": "user.emails.ActivationEmail",
-              "password_reset": "user.emails.PasswordResetEmail"},
+    "EMAIL": {"activation": "users.emails.ActivationEmail",
+              "password_reset": "users.emails.PasswordResetEmail"},
     "PROTOCOL": os.getenv("FRONTEND_PROTOCOL"),
     'SERIALIZERS': {
-        'user_create': 'user.serializers.UserCreateSerializer',
-        'current_user': 'user.serializers.UserSerializer',
+        'user_create': 'users.serializers.UserCreateSerializer',
+        'current_user': 'users.serializers.UserSerializer',
     }
 }
 

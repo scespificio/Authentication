@@ -64,8 +64,8 @@ Wrapper Axios avec:
 
 Endpoints utilises:
 
-- Auth: `/user/auth/jwt/create/`, `/auth/jwt/refresh/`.
-- Config: `/user/config/me/`.
+- Auth: `/users/auth/jwt/create/`, `/auth/jwt/refresh/`.
+- Config: `/users/config/me/`.
 - Activation: `/auth/users/activation/`, `/auth/users/resend_activation/`.
 - Reset: `/auth/users/reset_password_confirm/`, `/auth/users/reset_password/`.
 

@@ -20,13 +20,14 @@ import debug_toolbar
 import djoser
 
 
-admin.site.site_header = 'File Depot'
+admin.site.site_header = 'Authenticate'
 admin.site.index_title = 'Administration'
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('user.urls')),
+    path('', include('users.urls')),
+    path('', include('core.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('auth/', include('djoser.urls')),
     path(r'^auth/', include('djoser.urls.jwt')),
