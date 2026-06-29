@@ -1,13 +1,16 @@
 from django.shortcuts import render
 from django.conf import settings
-from .models import Société, Profil, Domaine
-from .serializers import CompanySerializer, ProfileSerializer, DomainSerializer
+from .models import ProfilUtilisateur, Domaine
+from .serializers import ProfileSerializer, DomainSerializer, CoreTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from rest_framework.response import Response
 from rest_framework import permissions, status
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.generics  import GenericAPIView
 from rest_framework.decorators import action
+from users.serializers import CustomTokenObtainPairSerializer
+from django.core.exceptions import ValidationError
 
 from dotenv import load_dotenv
 import os
@@ -19,6 +22,10 @@ CONFIG_FOLDER = os.getenv('CONFIG_FILE_FOLDER')
 CONFIG_FILE = os.getenv('CONFIG_FILE_NAME')
 
 # Create your views here.
+    
+class CoreTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
 
 class ConfigDetailView(ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -41,25 +48,9 @@ class ConfigDetailView(ReadOnlyModelViewSet):
 
         return Response(data, status=status.HTTP_200_OK)
 
-class CompanyView(GenericAPIView): # GET all
-    serializer_class = CompanySerializer
-    queryset = Société.objects.all()
-
-    def get(self, request):
-        obj = self.get_queryset()
-        return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)
-
-class CompanyViewDetail(GenericAPIView): # GET one
-    serializer_class = CompanySerializer
-    queryset = Société.objects.all()
-
-    def get(self, request):
-        obj = self.get_queryset().filter(profil__utilisateur=request.user).distinct() # The user can only see the company they belong to
-        return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)
-
 class ProfileView(GenericAPIView): # GET all
     serializer_class = ProfileSerializer
-    queryset = Profil.objects.all()
+    queryset = ProfilUtilisateur.objects.all()
 
     def get(self, request):
         obj = self.get_queryset()
@@ -67,16 +58,16 @@ class ProfileView(GenericAPIView): # GET all
 
 class ProfileViewDetail(GenericAPIView): # GET one
     serializer_class = ProfileSerializer
-    queryset = Profil.objects.all()
+    queryset = ProfilUtilisateur.objects.all()
 
     def get(self, request):
         obj = self.get_queryset().filter(utilisateur=request.user)
         return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)
 
-class DomainView(GenericAPIView): # GET list
+class DomainView(GenericAPIView): # GET all (TEMPORAIRE)
     serializer_class = DomainSerializer
     queryset = Domaine.objects.all()
 
     def get(self, request):
-        obj = self.get_queryset().filter(société__profil__utilisateur=request.user).distinct()
+        obj = self.get_queryset()
         return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)

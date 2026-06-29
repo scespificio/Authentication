@@ -1,15 +1,16 @@
 from django.contrib import admin
-from core.models import Société, Profil, Domaine
+from core.models import ProfilUtilisateur, Domaine
 
-@admin.register(Société)
-class CompanyAdmin(admin.ModelAdmin):
-    list_display = ["nom"]
-    ordering = ["-id"]
-
-@admin.register(Profil)
+@admin.register(ProfilUtilisateur)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ["nom"]
     ordering = ["-id"]
+
+class ProfilUtilisateurDomaineInline(admin.TabularInline):
+    model = ProfilUtilisateur.domaines.through
+    extra = 1
+
+    fields = ['domaines']
 
 @admin.register(Domaine)
 class DomainAdmin(admin.ModelAdmin):

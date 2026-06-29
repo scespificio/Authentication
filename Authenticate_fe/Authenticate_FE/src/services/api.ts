@@ -78,7 +78,7 @@ export class ApiService {
         }
     }
     async getConfig(): Promise<ConfigData> {
-        const response = await this.#axiosInstance.get("/users/config/me/");
+        const response = await this.#axiosInstance.get("/core/theme/me/");
         return response.data;
     }
     async postActivation(uid: string, token: string) {

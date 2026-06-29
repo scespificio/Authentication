@@ -18,6 +18,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useLayoutEffect } from "react";
 import ResetPassword from "./pages/ResetPassword";
 
+
 // Required because ScrollRestoration only works with React Router data mode
 const ScrollToTopWrapper = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();

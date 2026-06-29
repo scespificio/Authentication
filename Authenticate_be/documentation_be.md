@@ -13,7 +13,7 @@ Ce document décrit le code present dans `Authenticate_be`. Il couvre l'architec
 ## Arborescence utile
 
 - `Authenticate/theme/` : configuration Django (settings, urls, wsgi/asgi, celery).
-- `Authenticate/core/` : gestion des profils & sites (profil, société, domaine).
+- `Authenticate/core/` : gestion des profils & sites (profil, domaine).
 - `Authenticate/users/` : gestion des utilisateurs, authentification et envoi d'emails (utilisateurs, email).
 - `Authenticate/images/` : gestion des images, admin, upload en lot.
 - `docker_resources/Authenticate_dc.prod.yml` : infra locale/prod.
@@ -64,28 +64,23 @@ Endpoints core (`Authenticate/core/urls.py`):
 
 ### Models (`Authenticate/core/models.py`)
 
-- `Société`: . Champs: `nom`
-- `Profil`: . Champs:  `nom`, `utilisateur` (FK vers `User`), `société` (FK vers `Société`)
-- `Domaine`: . Champs: `nom`, `url`, `société` (FK vers `Société`)
+- `ProfilUtilisateur`: . Champs:  `nom`, `utilisateur` (FK vers `User`), `domaines` (FK ManyToMany vers `Domaine`)
+- `Domaine`: . Champs: `nom`, `url`
 
 ### Serializers (`Authenticate/core/serializers.py`)
 
-- `CompanySerializer`: informations de base sur la société.
 - `DomainSerializer`: informations de base sur le domaine.
 - `ProfileSerializer`: informations de base sur le profil utilisateur.
 
 ### Views (`Authenticate/core/views.py`)
 
-- `CompanyView`: renvoie les informations sur toutes les sociétés enregistrées.
-- `CompanyViewDetail`: renvoie les informations sur la société associée à l'utilisateur actuellement connecté.
-- `ProfileView`: renvoie les informations sur tous les utilisateurs.
-- `ProfileViewDetail`: renvoie les informations sur le profil utilisateur associé à l'utilisateur actuellement connecté.
-- `DomainView`: renvoie les informations sur les domaines associés à la société de l'utilisateur actuellement connecté.
+- `ProfileView`: renvoie les informations sur les profils utilisateurs.
+- `ProfileViewDetail`: renvoie les informations sur les profils utilisateur associés à l'utilisateur actuellement connecté.
+- `DomainView`: renvoie les informations sur les domaines
 
 ### Admin (`Authenticate/core/admin.py`)
 
-- Admin `Société`
-- Admin `Profil`
+- Admin `ProfilUtilisateur`
 - Admin `Domaine`
 
 ## App `users`

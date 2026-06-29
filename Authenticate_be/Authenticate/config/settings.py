@@ -95,7 +95,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 "django.template.context_processors.media",
-                'users.context_processors.frontend_base_url',
+                'core.context_processors.frontend_base_url',
             ],
         },
     },
@@ -128,6 +128,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_RATES": { # On ajoute manuellement les fréquences de throtting car authenticate() est inutilisé par l'endpoint d'authentification.
+        "user": "5/min"
+    },
 }
 
 if DEBUG:
@@ -158,7 +161,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# User (authentification)
 AUTH_USER_MODEL = "users.User"
+USERS_LOGIN_FIELD = "both"  # "username", "email" ou "both"
+
 # Static files (CSS, JS, images)
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"   # dossier où collectstatic va tout mettre

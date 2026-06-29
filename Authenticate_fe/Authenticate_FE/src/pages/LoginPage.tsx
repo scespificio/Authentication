@@ -74,10 +74,10 @@ export default function LoginPage() {
           <Fieldset.Content gap={4}>
             <Field.Root invalid={!!emailError || !!error}>
               <Field.Label fontSize="md" fontWeight="bold" ps={3}>
-                E-Mail
+                Votre e-mail ou mot de passe
               </Field.Label>
               <Input
-                type="email"
+                //type="email"
                 background="bg"
                 borderColor="template.gray"
                 onChange={handleEmailChange}

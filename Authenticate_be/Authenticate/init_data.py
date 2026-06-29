@@ -8,7 +8,8 @@ django.setup()
 
 # Only import models AFTER django.setup()
 from django.contrib.auth import get_user_model
-from core.models import Profil, Société, Domaine
+from core.models import ProfilUtilisateur, Domaine
+from users.models import User
 
 User = get_user_model()
 
@@ -18,6 +19,7 @@ def create_superuser():
         return User.objects.get(email='admin@espificio.com')
     
     superuser = User.objects.create_superuser(
+        username='admin',
         email='admin@espificio.com',
         password='espificio',
         first_name='Admin',
@@ -27,51 +29,39 @@ def create_superuser():
     print(f"Created superuser: {superuser.email}")
     return superuser
 
-def create_company():
-    if Société.objects.filter(nom='Espificio').exists():
-        print("Company already exists.")
-        return Société.objects.get(nom='Espificio')
-    
-    company, _ = Société.objects.get_or_create(
-        nom='Espificio'
-    )
-
-    print("Created company ", company.nom)
-    return company
-
-def create_profile(superuser, company):
-    if Profil.objects.filter(nom='admin').exists():
-        print("Profile already exists.")
-        return
-
-    profile, _ = Profil.objects.get_or_create(
-        utilisateur = superuser,
-        société = company,
-        nom='admin'
-    )
-
-    print("Created profile ", profile.nom)
-
-def create_domain(company):
-    if Domaine.objects.filter(nom='CRAOnline').exists():
-        print("Domain already exists.")
-        return
-    
+def create_domains():    
     domain, _ = Domaine.objects.get_or_create(
-        société = company,
         nom='CRAOnline',
         url='craonline.espificio.com'
     ) 
 
-    print("Created domain ", domain.url)
+    if Domaine.objects.filter(nom='CRAOnline').exists():
+        print("Domain already exists.")
+    else:
+         print("Created domain ", domain.url)
+
+    return domain
+
+def create_profile(superuser, domain):
+    if ProfilUtilisateur.objects.filter(nom='admin').exists():
+        print("Profile already exists.")
+        return
+
+    profile, _ = ProfilUtilisateur.objects.get_or_create(
+        utilisateur = superuser,
+        nom='admin'
+    )
+
+    profile.domaines.add(domain)
+
+    print("Created profile ", profile.nom)
 
 def main():
     print("Creating basic user account...")
     try:
         superuser = create_superuser()
-        company = create_company()
-        create_profile(superuser, company)
-        create_domain(company)
+        domain = create_domains()
+        create_profile(superuser, domain)
 
         print("\nDone! Login credentials:")
         print("Email: admin@espificio.com")
