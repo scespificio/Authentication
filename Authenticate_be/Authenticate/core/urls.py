@@ -11,5 +11,4 @@ urlpatterns = [
     path('profil/', views.ProfileView.as_view(), name='profil'),
     path('profil/me/', views.ProfileViewDetail.as_view(), name='profil-me'),
     path('domaine/', views.DomainView.as_view(), name='domaine'),
-    path("auth/jwt/create/<str:url_slug>", views.CoreTokenObtainPairView.as_view(), name='jwt-create')
 ] + router.urls

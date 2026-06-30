@@ -2,28 +2,49 @@
 
 Ce document décrit le code present dans `Authenticate_be`. Il couvre l'architecture, les apps Django, les points d'entree API, les taches Celery, et les fichiers d'infra (Docker).
 
+# Organisation du projet / Arborescence utile
+
+==============================
+
+## Arborescence utile
+
+------------
+
+```
+Authenticate_be/
+│
+├── Authenticate/
+│   └── config/        <- configuration Django (settings, urls, wsgi/asgi, celery).
+│   └── core/         <- gestion des profils & sites (profil, domaine).
+│       └── migrations/
+│       └── services/
+│       └── templates/
+│   └── images/ // temporaire       <- gestion des images, admin, upload en lot.
+│       └── migrations/
+│       └── static/
+│       └── templates/
+│
+└── docker_resources/         <- infra locale/prod. / build images
+    └── `Dockerfile.dev`
+    └── `Dockerfile.prod`
+    └── `docker-compose.prod.yml`
+    └── `docker-compose.dev.yml`
+```
+
+------------------------
+
 ## Vue d'ensemble
 
-- Projet Django REST (DRF) avec authentification JWT (SimpleJWT) et Djoser.
+- Projet Django REST (DRF) avec authentification JWT (Djoser) paramétrable via l'application Django packagée `users`.
 - Base de donnees MySQL, cache/broker Redis, emails SMTP, taches async via Celery.
 - Deux apps locales principales: `core` et `images`.
 - App `tags` externe (fournie par le wheel `django_tags_app-0.1.0-py3-none-any.whl`) utilisee via `tags.models.TaggedItem` et `tags.admin.TagsInline`.
 - App `users` externe (fournie par le wheel `django_users_apps-0.1.0-py3-none-any.whl`) utilisee via `users.models.User`, `users.serializers`, `users.views`, `users.emails` et `users.urls`.
 
-## Arborescence utile
-
-- `Authenticate/theme/` : configuration Django (settings, urls, wsgi/asgi, celery).
-- `Authenticate/core/` : gestion des profils & sites (profil, domaine).
-- `Authenticate/users/` : gestion des utilisateurs, authentification et envoi d'emails (utilisateurs, email).
-- `Authenticate/images/` : gestion des images, admin, upload en lot.
-- `docker_resources/Authenticate_dc.prod.yml` : infra locale/prod.
-- `docker_resources/Dockerfile.dev` / `docker_resources/Dockerfile.prod` : build images.
-
 ## Configuration Django (Authenticate)
 
 Fichier: `Authenticate/config/settings.py`
 
-- `AUTH_USER_MODEL = "users.User"` (auth via email).
 - DRF: JWT obligatoire par defaut, renderer JSON en prod.
 - Djoser: activation + reset password custom via `users.emails`.
 - Static: `STATIC_ROOT=staticfiles` et `STATICFILES_STORAGE=whitenoise`.
@@ -34,8 +55,10 @@ Fichier: `Authenticate/config/settings.py`
 
 Variables d'environnement (principales):
 
+- Authentification :  `AUTH_USER_MODEL = "users.User"`, `USERS_LOGIN_FIELD = "username" | "email" | "both"` (authentification sur le champ email par défaut.)
 - Django: `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_TIME_ZONE`, `DJANGO_ALLOWED_HOSTS`
 - CORS: `CORS_ALLOWED_ORIGINS`
+- REST_FRAMEWORK : `DEFAULT_THROTTLE_RATES` (rate limiting : nombre de tentatives de login possibles par minute pour un utilisateur.)
 - DB: `DB_NAME`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`
 - Email: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT`
 - Config : `CONFIG_FILE_FOLDER`, `CONFIG_FILE_NAME`
@@ -51,16 +74,39 @@ URLConf actif (celui reference dans settings): `Authenticate/config/urls.py`
 Routes principales:
 
 - Admin: `/admin/`
-- core API: `/users/` (voir `Authenticate/core/urls.py`)
-- users API: `/users/`
-- Auth Djoser: `/auth/`
-- Activation custom:
-  - `POST /auth/users/activation/` -> `users.views.ActivationView`
-  - `POST /auth/users/resend_activation/` -> `users.views.ActivationResendView`
+- core API: `/core/` (voir `Authenticate/core/urls.py`)
+- Auth djoser & custom : 
+  - `/users/auth/`
+  - `POST auth/jwt/create/:url` // En cours : endpoint d'authentification custom : vérifie en + si l'url est bien accessible à l'utilisateur.
 - Debug toolbar: `/__debug__/` (en dev)
 - Media: expose en dev via `static()` si `DEBUG=True`
 
 Endpoints core (`Authenticate/core/urls.py`):
+
+```
+core/
+│
+├── home/
+│
+├── theme/
+│   └── me/
+│
+├── profil/
+│   └── me/
+│
+└── domaine/
+```
+
+Endpoint custom API users :
+
+```
+users/
+└──  auth/
+    └── activation/
+    └── resend_activation/
+    └── jwt/
+          └── create/
+```
 
 ### Models (`Authenticate/core/models.py`)
 
@@ -92,12 +138,12 @@ Endpoints core (`Authenticate/core/urls.py`):
 
 ### Serializers (`Authenticate/users/serializers.py`)
 
-- `UserCreateSerializer`, `UserSerializer`: base Djoser adaptee a l'email.
-- `CustomTokenObtainPairSerializer`: login JWT qui renvoie le users et les tokens.
+- `UserCreateSerializer`, `UserSerializer`: base Djoser adaptee a l'email 
+- `CustomTokenObtainPairSerializer`: login JWT qui renvoie le users et les tokens : contourne la fonction django validate() ; utilise `USERS_LOGIN_FIELD` pour déterminer le champ utilisateur. Quand `USERS_LOGIN_FIELD = "both"`, cherche une correspondence sur les deux champs `username` et `email`.
 
 ### Views (`Authenticate/users/views.py`)
 
-- `CustomTokenObtainPairView`: endpoint JWT custom.
+- `CustomTokenObtainPairView`: endpoint JWT custom : implémente manuellement le throttling et dépend de `DEFAULT_THROTTLE_RATES`.
 - `ActivationView`: active un compte et envoie un email de reset mot de passe.
 - `ActivationResendView`: renvoie un lien d'activation.
 

@@ -12,8 +12,8 @@ export const config = defineConfig({
   theme: {
     tokens: {
       fonts: {
-        body: { value: "Outfit" },
-        heading: { value: "Outfit" },
+        body: { value: "Switzer-Regular" },
+        heading: { value: "Switzer-Bold" },
       },
       colors: {
         espificio: {
@@ -85,6 +85,33 @@ export const config = defineConfig({
           solid: { value: "{colors.espificio.purple.400}" },
           contrast: { value: "white" },
           fg: { value: "{colors.espificio.black}" },
+          muted: { value: "{colors.espificio.purple.200}" },
+          subtle: { value: "{colors.espificio.purple.100}" },
+          emphasized: { value: "{colors.espificio.purple.300}" },
+          focusRing: { value: "{colors.espificio.purple.400}" },
+        },
+        "espificio.teal": {
+          solid: { value: "{colors.espificio.teal.400}" },
+          contrast: { value: "white" },
+          fg: { value: "{colors.espificio.teal.700}" },
+          muted: { value: "{colors.espificio.teal.200}" },
+          subtle: { value: "{colors.espificio.teal.100}" },
+          emphasized: { value: "{colors.espificio.teal.300}" },
+          focusRing: { value: "{colors.espificio.teal.400}" },
+        },
+        "espificio.coral": {
+          solid: { value: "{colors.espificio.coral.400}" },
+          contrast: { value: "white" },
+          fg: { value: "{colors.espificio.coral.700}" },
+          muted: { value: "{colors.espificio.coral.200}" },
+          subtle: { value: "{colors.espificio.coral.100}" },
+          emphasized: { value: "{colors.espificio.coral.300}" },
+          focusRing: { value: "{colors.espificio.coral.400}" },
+        },
+        "espificio.purple": {
+          solid: { value: "{colors.espificio.purple.400}" },
+          contrast: { value: "white" },
+          fg: { value: "{colors.espificio.purple.700}" },
           muted: { value: "{colors.espificio.purple.200}" },
           subtle: { value: "{colors.espificio.purple.100}" },
           emphasized: { value: "{colors.espificio.purple.300}" },

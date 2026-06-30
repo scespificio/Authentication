@@ -129,7 +129,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_THROTTLE_RATES": { # On ajoute manuellement les fréquences de throtting car authenticate() est inutilisé par l'endpoint d'authentification.
-        "user": "5/min"
+        "user": "15/min"
     },
 }
 

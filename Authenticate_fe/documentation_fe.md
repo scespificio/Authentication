@@ -65,9 +65,8 @@ Wrapper Axios avec:
 Endpoints utilises:
 
 - Auth: `/users/auth/jwt/create/`, `/auth/jwt/refresh/`.
-- Config: `/users/config/me/`.
-- Activation: `/auth/users/activation/`, `/auth/users/resend_activation/`.
-- Reset: `/auth/users/reset_password_confirm/`, `/auth/users/reset_password/`.
+- Config: `/core/theme/me/`.
+- Activation: `/users/auth/activation/`, `/users/auth/resend_activation/`.
 
 ## Composants principaux
 
@@ -88,7 +87,7 @@ Composants UI reutilises:
 
 ## Pages
 
-- `HomePage` : accueil, intro config + grille categories.
+- `HomePage` : accueil.
 - `LoginPage` : authentification.
 - `PasswordForgottenPage` : demande reset password.
 - `AccountActivationPage` : activation compte + resend activation.

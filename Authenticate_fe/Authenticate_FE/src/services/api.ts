@@ -62,7 +62,7 @@ export class ApiService {
     async refreshToken(): Promise<string> {
         if (!this.#user?.refresh_token) { throw new Error("Missing refresh token"); }
         try {
-            const response = await this.#axiosInstance.post("/auth/jwt/refresh/",
+            const response = await this.#axiosInstance.post("/users/auth/jwt/refresh/",
                 { "refresh": this.#user!.refresh_token },
                 { headers: { Authorization: "" as any } }
             );
@@ -82,19 +82,19 @@ export class ApiService {
         return response.data;
     }
     async postActivation(uid: string, token: string) {
-        const response = await this.#axiosInstance.post("/auth/users/activation/", { "uid": uid, "token": token });
+        const response = await this.#axiosInstance.post("/users/auth/activation/", { "uid": uid, "token": token });
         return response.data;
     }
     async postResendActivation(email: string) {
-        const response = await this.#axiosInstance.post("/auth/users/resend_activation/", { "email": email });
+        const response = await this.#axiosInstance.post("/users/auth/resend_activation/", { "email": email });
         return response.data;
     }
     async postResetPassword(uid: string, token: string, new_password: string) {
-        const response = await this.#axiosInstance.post("/auth/users/reset_password_confirm/", { "uid": uid, "token": token, "new_password": new_password });
+        const response = await this.#axiosInstance.post("/users/auth/users/reset_password_confirm/", { "uid": uid, "token": token, "new_password": new_password });
         return response.data;
     }
     async postPasswordForgotten(email: string) {
-        const response = await this.#axiosInstance.post("/auth/users/reset_password/", { "email": email });
+        const response = await this.#axiosInstance.post("/users/auth/users/reset_password/", { "email": email });
         return response.data;
     }
 }
