@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
+from .users_settings import AUTH_USER_MODEL, USERS_LOGIN_FIELD, ACTIVATION_MAIL_BODY
 
 load_dotenv()
 
@@ -160,10 +161,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-# User (authentification)
-AUTH_USER_MODEL = "users.User"
-USERS_LOGIN_FIELD = "both"  # "username", "email" ou "both"
 
 # Static files (CSS, JS, images)
 STATIC_URL = "/static/"

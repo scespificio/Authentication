@@ -14,7 +14,7 @@ export default function BaseLayout(props: Props) {
       height="full"
     >
       <Box position="absolute" top={0} left={5}>
-        <Image src="/images/placeholder-logo-name.svg" width="200px" alt="Logo placeholder" /> 
+        <Image src="/images/FAVICON ESPIFICIO.png" width="200px" alt="Logo placeholder" />
       </Box>
       <Center height="dvh">{props.children}</Center>
     </Box>
