@@ -31,7 +31,7 @@ Ce document decrit le code present dans `Authenticate_fe/Authenticate_fe`. Il co
 - UI avec Chakra UI (system v3), webconfig partagée, et polices Switzer.
 - Auth JWT via API backend (Django) et paramétrable en config backend.
 - Routing avec React Router.
-- Autorisation, redirection avec window.location.href avec paramètres de recherches inclus dans l'URL.
+- Autorisation, redirection vers d'autres domaines avec paramètres de recherches inclus dans l'URL.
 
 ## Point d'entree
 
@@ -58,7 +58,7 @@ Un ErrorBoundary global affiche `ErrorPage` en cas d'erreur.
 
 ### AuthContext (`Authenticate_fe/src/hooks/AuthContext.tsx`)
 
-- Gere l'utilisateur connecte, le login, le logout, et le refresh de token.
+- Gere l'utilisateur connecte, le login, le logout, l'autorisation d'accès aux domaines et le refresh de token.
 - Stocke l'utilisateur en localStorage.
 - Expose `ApiService` preconfigure avec le user.
 

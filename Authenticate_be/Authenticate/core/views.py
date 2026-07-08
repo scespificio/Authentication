@@ -77,20 +77,30 @@ class AuthorizeView(GenericAPIView):# GET response
     def get(self, request):
 
         if not "X-Requested-Host" in request.headers:
-            return Response({"error": "Adresse invalide. Veuillez vérifier vos headers"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Domaine invalide. Veuillez vérifier vos headers"}, status=status.HTTP_400_BAD_REQUEST)
 
-        host = request.headers.get("X-Requested-Host") # Lecture de l'adresse d'origine depuis les headers
+        host = request.headers.get("X-Requested-Host") # Lecture du domaine d'origine depuis les headers
         domain = Domaine.objects.filter(url=host).first()
 
         if not domain :
-            return Response({"error": f"L'adresse {host} est introuvable."},status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Le domaine {host} est introuvable."},status=status.HTTP_404_NOT_FOUND)
 
         is_authorized = ProfilUtilisateur.objects.filter(Q(utilisateur=request.user), Q(domaines=domain)).exists()
 
         if is_authorized :
-            return Response({"message": "Autorisation réussie avec succès."},status=status.HTTP_200_OK)
+            response = Response({"message": "Autorisation réussie avec succès.", "authorized":True},status=status.HTTP_200_OK)
+            response.set_cookie(
+                "session_auth",
+                value=generated_token,
+                httponly=True,
+                secore=True,
+                samesite="Lax",
+                domain=host,
+                max_age=3600
+            )
+            return response
         else :
             return Response(
-                {"error":f"L'autorisation a échoué : vous n'avez pas accès à l'adresse {host}"},
+                {"error":f"L'autorisation a échoué : vous n'avez pas accès à {host}"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
