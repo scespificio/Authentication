@@ -6,25 +6,23 @@ Ce document décrit le code present dans `Authenticate_be`. Il couvre l'architec
 
 ==============================
 
-## Arborescence utile
-
 ------------
 
 ```
 Authenticate_be/
 │
 ├── Authenticate/
-│   └── config/        <- configuration Django (settings, urls, wsgi/asgi, celery).
-│   └── core/         <- gestion des profils & sites (profil, domaine).
+│   └── config/           <- configuration Django (settings, urls, wsgi/asgi, celery).
+│   └── core/             <- gestion des profils & sites (profil, domaine).
 │       └── migrations/
 │       └── services/
 │       └── templates/
-│   └── images/ // temporaire       <- gestion des images, admin, upload en lot.
+│   └── images/           <- gestion des images, admin, upload en lot. // temporaire
 │       └── migrations/
 │       └── static/
 │       └── templates/
 │
-└── docker_resources/         <- infra locale/prod. / build images
+└── docker_resources/     <- infra locale/prod. / build images
     └── `Dockerfile.dev`
     └── `Dockerfile.prod`
     └── `docker-compose.prod.yml`
@@ -57,7 +55,7 @@ Variables d'environnement (principales):
 
 - Authentification :  `AUTH_USER_MODEL = "users.User"`, `USERS_LOGIN_FIELD = "username" | "email" | "both"` (authentification sur le champ email par défaut.)
 - Django: `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_TIME_ZONE`, `DJANGO_ALLOWED_HOSTS`
-- CORS: `CORS_ALLOWED_ORIGINS`
+- CORS: `CORS_ALLOWED_ORIGINS`, `CORS_ALLOW_HEADERS` (ajoute le header custom `X-Requested-Host` pour l'autorisation d'accès à un domaine)
 - REST_FRAMEWORK : `DEFAULT_THROTTLE_RATES` (rate limiting : nombre de tentatives de login possibles par minute pour un utilisateur.)
 - DB: `DB_NAME`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`
 - Email: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT`
@@ -94,7 +92,10 @@ core/
 ├── profil/
 │   └── me/
 │
-└── domaine/
+├── domaine/
+│
+└── auth/
+    └── authorize/
 ```
 
 Endpoint custom API users :
@@ -111,7 +112,7 @@ users/
 ### Models (`Authenticate/core/models.py`)
 
 - `ProfilUtilisateur`: . Champs:  `nom`, `utilisateur` (FK vers `User`), `domaines` (FK ManyToMany vers `Domaine`)
-- `Domaine`: . Champs: `nom`, `url`
+- `Domaine`: Champs: `nom`, `url`.
 
 ### Serializers (`Authenticate/core/serializers.py`)
 
@@ -123,6 +124,7 @@ users/
 - `ProfileView`: renvoie les informations sur les profils utilisateurs.
 - `ProfileViewDetail`: renvoie les informations sur les profils utilisateur associés à l'utilisateur actuellement connecté.
 - `DomainView`: renvoie les informations sur les domaines
+- `AuthorizeView`: vérifie que le domaine demandé fait partie de la liste des autorisations et renvoie une réponse. 
 
 ### Admin (`Authenticate/core/admin.py`)
 
@@ -174,7 +176,7 @@ Template admin associe:
 
 ## App `images`
 
-N'est pas utilisée actuellement.
+**N'est pas utilisée actuellement.**
 
 ### Models (`Authenticate/images/models.py`)
 

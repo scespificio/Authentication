@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/AuthContext";
+import { useHost } from "@/hooks/HostProvider";
 import { useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import { Link, Navigate } from "react-router";
@@ -16,8 +17,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string | null>();
   const [error, setError] = useState<string | null>(null);
 
-  const { user, login } = useAuth();
+  const { user, login, authorize } = useAuth();
+  const { host } = useHost();
   const { showBoundary } = useErrorBoundary();
+
+  const redirectToExternalUrl = (host: string) => {
+    const url = "http://" + host
+    window.location.href = url
+  };
 
   function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
@@ -37,16 +44,24 @@ export default function LoginPage() {
     try {
       setLoading(true);
       await login(email!, password!);
+      await authorize(host);
+      redirectToExternalUrl(host);
     } catch (error) {
       if (error instanceof AxiosError) {
         switch (error.status) {
           case 400:
             if (error.response?.data["email"]) {
               setEmailError(error.response.data["email"][0]);
+            } else {
+              setError("Identifiants ou droits d'accès invalides.");
             }
             break;
           case 401: {
-            setError("Identifiants invalides");
+            setError("Identifiants ou droits d'accès invalides.");
+            break;
+          }
+          case 404: {
+            setError("URL introuvable.");
             break;
           }
           default:
@@ -61,7 +76,9 @@ export default function LoginPage() {
   }
 
   if (user) {
-    return <Navigate to="/" replace />;
+    //redirectToExternalUrl('http://www.test.espificio.com')
+    console.log("Wow, user!")
+    //return <Navigate to="/" replace />;
   }
 
   return (

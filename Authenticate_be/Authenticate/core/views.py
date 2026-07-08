@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.conf import settings
+from django.db.models import Q
 from .models import ProfilUtilisateur, Domaine
 from .serializers import ProfileSerializer, DomainSerializer, CoreTokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
 
 from rest_framework.response import Response
 from rest_framework import permissions, status
@@ -11,6 +11,7 @@ from rest_framework.generics  import GenericAPIView
 from rest_framework.decorators import action
 from users.serializers import CustomTokenObtainPairSerializer
 from django.core.exceptions import ValidationError
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from dotenv import load_dotenv
 import os
@@ -71,3 +72,25 @@ class DomainView(GenericAPIView): # GET all (TEMPORAIRE)
     def get(self, request):
         obj = self.get_queryset()
         return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)
+
+class AuthorizeView(GenericAPIView):# GET response
+    def get(self, request):
+
+        if not "X-Requested-Host" in request.headers:
+            return Response({"error": "Adresse invalide. Veuillez vérifier vos headers"}, status=status.HTTP_400_BAD_REQUEST)
+
+        host = request.headers.get("X-Requested-Host") # Lecture de l'adresse d'origine depuis les headers
+        domain = Domaine.objects.filter(url=host).first()
+
+        if not domain :
+            return Response({"error": f"L'adresse {host} est introuvable."},status=status.HTTP_404_NOT_FOUND)
+
+        is_authorized = ProfilUtilisateur.objects.filter(Q(utilisateur=request.user), Q(domaines=domain)).exists()
+
+        if is_authorized :
+            return Response({"message": "Autorisation réussie avec succès."},status=status.HTTP_200_OK)
+        else :
+            return Response(
+                {"error":f"L'autorisation a échoué : vous n'avez pas accès à l'adresse {host}"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )

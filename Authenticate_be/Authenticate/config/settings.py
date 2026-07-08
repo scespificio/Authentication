@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 from .users_settings import AUTH_USER_MODEL, USERS_LOGIN_FIELD, ACTIVATION_MAIL_BODY
+from corsheaders.defaults import default_headers
 
 load_dotenv()
 
@@ -43,6 +44,10 @@ if CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS = [h.strip() for h in CORS_ALLOWED_ORIGINS.split(",") if h.strip()]
 else:
     CORS_ALLOWED_ORIGINS = []
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "X-Requested-Host",
+]
 
 # Application definition
 INSTALLED_APPS = [

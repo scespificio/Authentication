@@ -2,21 +2,36 @@
 
 Ce document decrit le code present dans `Authenticate_fe/Authenticate_fe`. Il couvre l'architecture front, les pages React, les contextes, le theme, et l'infra (Docker/Ansible).
 
+# Organisation du projet / arborescence utile
+
+------------
+
+```
+    Authenticate_fe/
+    │
+    ├── src/        <- code React (pages, components, hooks, services).
+    │
+    ├── public/        <- assets statiques (images, polices, public/index.html).
+    │ 
+    ├── vite.config.ts/        <- config Vite (port dev, base path, allowed hosts).
+    │
+    ├── docker_resources/        <- build dev/prod.
+    │   └── `Dockerfile`
+    │   └── `docker-compose.dev.yml`
+    │   └── `docker-compose.prod.yml`
+    │
+    └── .env.example        <- variables attendues.
+```
+
+------------------------
+
 ## Vue d'ensemble
 
 - Frontend React + Vite + TypeScript.
-- UI avec Chakra UI (system v3), theme personnalise, et polices Switzer.
-- Auth JWT via API backend (Django), gestion du panier en localStorage.
+- UI avec Chakra UI (system v3), webconfig partagée, et polices Switzer.
+- Auth JWT via API backend (Django) et paramétrable en config backend.
 - Routing avec React Router.
-
-## Arborescence utile
-
-- `Authenticate_fe/src/` : code React (pages, components, hooks, services).
-- `Authenticate_fe/public/` : assets statiques (images, polices, public/index.html).
-- `Authenticate_fe/vite.config.ts` : config Vite (port dev, base path, allowed hosts).
-- `Authenticate_fe/docker_resources/Dockerfile` : build dev/prod.
-- `Authenticate_fe/docker_resources/docker-compose.dev.yml` / `Authenticate_fe/docker_resources/docker-compose.prod.yml` : services.
-- `Authenticate_fe/.env.example` : variables attendues.
+- Autorisation, redirection avec window.location.href avec paramètres de recherches inclus dans l'URL.
 
 ## Point d'entree
 
@@ -29,7 +44,7 @@ Defini dans `Authenticate_fe/src/App.tsx`:
 
 - Public
   - `/activate/:uid/:token` -> `AccountActivationPage`
-  - `/auth/reset-password/:uid/:token` -> `ResetPassword`
+  - `/reset-password/:uid/:token` -> `ResetPassword`
   - `/connexion` -> `LoginPage`
   - `/mot-de-passe-oublie` -> `PasswordForgottenPage`
 - Protege (via `ProtectedRoute` + `ProtectedLayout`)
@@ -52,6 +67,11 @@ Un ErrorBoundary global affiche `ErrorPage` en cas d'erreur.
 - Hydrate Chakra avec un theme basé sur la config (`clientSystem`).
 - Persiste la config en localStorage.
 
+### HostProvider (`Authenticate_fe/src/hooks/HostProvider.tsx`)
+
+- Gère les paramètres de recherche, extrait le nom de domaine d'origine depuis l'URL.
+- Expose le nom de domaine d'origine dans la variable `host`
+
 ## Service API
 
 Fichier: `Authenticate_fe/src/services/api.ts`
@@ -65,6 +85,7 @@ Wrapper Axios avec:
 Endpoints utilises:
 
 - Auth: `/users/auth/jwt/create/`, `/auth/jwt/refresh/`.
+- Autorisation: `/core/auth/authorize/`.
 - Config: `/core/theme/me/`.
 - Activation: `/users/auth/activation/`, `/users/auth/resend_activation/`.
 
@@ -88,7 +109,7 @@ Composants UI reutilises:
 ## Pages
 
 - `HomePage` : accueil.
-- `LoginPage` : authentification.
+- `LoginPage` : authentification (email ou username + MDP).
 - `PasswordForgottenPage` : demande reset password.
 - `AccountActivationPage` : activation compte + resend activation.
 - `ResetPassword` : page reset password (utilisee dans App).
@@ -102,7 +123,7 @@ Dans `Authenticate_fe/src/types/`:
 
 ## Assets et styles
 
-- Images: `Authenticate_fe/public/images/*`.
+- Images & logos : `Authenticate_fe/public/images/*`.
 - `public/index.html` contient un `config.js` runtime genere par Docker.
 - `index.html` a la racine est le point d'entree Vite (celui utilise par defaut).
 

@@ -9,15 +9,17 @@ import { useConfig } from "./ConfigContext";
 interface AuthContextType {
   user?: UserData;
   login: (email: string, password: string) => Promise<void>;
-  tokenRefresh: () => void;
+  authorize: (host: string) => Promise<void>
   logout: () => void;
+  tokenRefresh: () => void;
   apiService: ApiService;
 }
 
 const AuthContext = createContext<AuthContextType>({
-  login: async () => {},
-  logout: () => {},
-  tokenRefresh: () => {},
+  login: async () => { },
+  authorize: async () => { },
+  logout: () => { },
+  tokenRefresh: () => { },
   apiService: new ApiService(),
 });
 
@@ -38,12 +40,15 @@ export function AuthProvider(props: Props) {
     setUser(await apiService.login(email, password));
     try {
       updateConfig(await apiService.getConfig());
-      navigate("/");
     } catch {
       throw Error(
         "Une erreur est survenue lors du chargement de la configuration"
       );
     }
+  };
+
+  const handleAuthorization = async (host: string) => {
+    await apiService.authorize(host);
   };
 
   const handleTokenRefresh = () => {
@@ -72,13 +77,14 @@ export function AuthProvider(props: Props) {
   const value: AuthContextType = {
     user: user,
     login: handleLogin,
+    authorize: handleAuthorization,
     tokenRefresh: handleTokenRefresh,
     logout: () => handleLogout("Vous êtes maintenant déconnecté"),
     apiService: apiService,
   };
 
   useEffect(() => {
-    
+
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));

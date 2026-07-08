@@ -11,7 +11,7 @@ interface ConfigContextType {
 }
 
 const ConfigContext = createContext<ConfigContextType>({
-  updateConfig: () => {},
+  updateConfig: () => { },
 });
 
 interface Props {
@@ -51,7 +51,7 @@ export function ConfigProvider(props: Props) {
 
   return (
     <ConfigContext.Provider value={value}>
-      <ChakraProvider value={system}>{ loading ? <Loader /> : props.children}</ChakraProvider>
+      <ChakraProvider value={system}>{loading ? <Loader /> : props.children}</ChakraProvider>
     </ConfigContext.Provider>
   );
 }

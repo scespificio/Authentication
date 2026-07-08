@@ -46,6 +46,12 @@ export class ApiService {
     setUser(user?: UserData) {
         this.#user = user;
     }
+
+    async authorize(host: string) {
+        const response = await this.#axiosInstance.get("/core/auth/authorize/", { headers: { "X-Requested-Host": host } });
+        return response.data;
+    }
+
     async login(email: string, password: string): Promise<UserData> {
         const response = await this.#axiosInstance.post<UserData>("/users/auth/jwt/create/", {
             "email": email,
@@ -89,11 +95,11 @@ export class ApiService {
         const response = await this.#axiosInstance.post("/users/auth/resend_activation/", { "email": email });
         return response.data;
     }
-    async postResetPassword(uid: string, token: string, new_password: string) {
+    async postResetPassword(uid: string, token: string, new_password: string) { // Inutilisé
         const response = await this.#axiosInstance.post("/users/auth/users/reset_password_confirm/", { "uid": uid, "token": token, "new_password": new_password });
         return response.data;
     }
-    async postPasswordForgotten(email: string) {
+    async postPasswordForgotten(email: string) { // Inutilisé
         const response = await this.#axiosInstance.post("/users/auth/users/reset_password/", { "email": email });
         return response.data;
     }
