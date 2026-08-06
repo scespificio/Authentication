@@ -12,4 +12,5 @@ urlpatterns = [
     path('profil/me/', views.ProfileViewDetail.as_view(), name='profil-me'),
     path('domaine/', views.DomainView.as_view(), name='domaine'),
     path('auth/authorize/', views.AuthorizeView.as_view(), name='autorisation'),
+    path('auth/jwt/check/', views.CheckCookieView.as_view(), name='check-jwt-cookie'),
 ] + router.urls
