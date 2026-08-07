@@ -29,10 +29,8 @@ export function HostProvider(props: Props) {
 
         if (extracted_url?.substring(0, 4) === "www.") { // reformats www
             let reformatted_url = extracted_url?.substring(4, extracted_url?.length + 1)
-            console.log(reformatted_url)
             setHost(reformatted_url ?? undefined)
         } else {
-            console.log(extracted_url)
             setHost(extracted_url ?? undefined)
         }
 

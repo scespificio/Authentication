@@ -10,6 +10,7 @@ export class ApiService {
             baseURL: import.meta.env.VITE_BACKEND_URL,
             headers: { "Content-Type": "application/json" },
             timeout: import.meta.env.VITE_BACKEND_TIMEOUT,
+            withCredentials: true,
         });
         this.#user = user;
 

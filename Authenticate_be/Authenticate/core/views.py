@@ -9,6 +9,7 @@ from users.serializers import CustomTokenObtainPairSerializer
 
 from rest_framework.response import Response
 from rest_framework import permissions, status
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.generics  import GenericAPIView
 from rest_framework.decorators import action
@@ -80,11 +81,10 @@ class AuthorizeView(GenericAPIView):# GET response
             return Response({"error": "Domaine invalide. Veuillez vérifier vos headers"}, status=status.HTTP_400_BAD_REQUEST)
 
         host = request.headers.get("X-Requested-Host") # Lecture du domaine d'origine depuis les headers
-        host_splitted = host.split(".")
+        host_split = host.split(".")
+        host_suffix = "." + host_split[1] + "." + host_split[2]
         token = request.headers.get("Authorization")[4:]
         domain = Domaine.objects.filter(url=host).first()
-
-        print("HOST", "." + host_splitted[1] + "." + host_splitted[2], "TOKEN", token)
 
         if not domain :
             return Response({"error": f"Le domaine {host} est introuvable."},status=status.HTTP_404_NOT_FOUND)
@@ -99,7 +99,7 @@ class AuthorizeView(GenericAPIView):# GET response
                 httponly=True,
                 secure=not settings.DEBUG,
                 samesite="Lax",
-                domain= "." + host_splitted[1] + "." + host_splitted[2],
+                domain= host_suffix,
                 max_age=3600
             )
             return response
@@ -111,12 +111,19 @@ class AuthorizeView(GenericAPIView):# GET response
             )
         
 class CheckCookieView(GenericAPIView):
+    authentication_classes = [] # Allows connection without a JWT, from other websites
+    permission_classes = [AllowAny]
+
     def get(self, request):
+        print("[INFO] Getting into this")
         token = request.COOKIES.get("session_auth")
         if not token:
+            print("[INFO] No session_auth cookie found.")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try :
             AccessToken(token)
         except TokenError:
+            print("[INFO] Invalid token in session_auth cookie.")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        print("[INFO] Something else happened.")
         return Response(status=status.HTTP_200_OK)
