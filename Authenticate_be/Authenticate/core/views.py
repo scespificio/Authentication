@@ -27,8 +27,6 @@ load_dotenv()
 CONFIG_FOLDER = os.getenv('CONFIG_FILE_FOLDER')
 CONFIG_FILE = os.getenv('CONFIG_FILE_NAME')
 
-# Create your views here.
-
 class ConfigDetailView(ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     #serializer_class = WebConfigOutputSerializer
@@ -56,7 +54,7 @@ class ProfileView(GenericAPIView): # GET all
 
     def get(self, request):
         obj = self.get_queryset()
-        return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)
+        return Response(self.get_serializer(obj, many=True).data, status=status.HTTP_200_OK)
 
 class ProfileViewDetail(GenericAPIView): # GET one
     serializer_class = ProfileSerializer
@@ -64,7 +62,7 @@ class ProfileViewDetail(GenericAPIView): # GET one
 
     def get(self, request):
         obj = self.get_queryset().filter(utilisateur=request.user)
-        return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)
+        return Response(self.get_serializer(obj, many=True).data, status=status.HTTP_200_OK)
 
 class DomainView(GenericAPIView): # GET all (TEMPORAIRE)
     serializer_class = DomainSerializer
@@ -72,24 +70,40 @@ class DomainView(GenericAPIView): # GET all (TEMPORAIRE)
 
     def get(self, request):
         obj = self.get_queryset()
-        return Response({"results": self.get_serializer(obj, many=True).data}, status=status.HTTP_200_OK)
+        return Response(self.get_serializer(obj, many=True).data, status=status.HTTP_200_OK)
+
+class DomainUserView (GenericAPIView): # GET all domaines associés avec l'utilisateur
+    serializer_class = DomainSerializer
+    queryset = Domaine.objects.all()
+
+    def get(self, request):
+        obj = self.get_queryset().filter(profils__utilisateur=request.user)
+        return Response(self.get_serializer(obj, many=True).data, status=status.HTTP_200_OK)
 
 class AuthorizeView(GenericAPIView):# GET response
     def get(self, request):
 
-        if not "X-Requested-Host" in request.headers:
-            return Response({"error": "Domaine invalide. Veuillez vérifier vos headers"}, status=status.HTTP_400_BAD_REQUEST)
+        if not "X-Requested-Host" in request.headers: # Aucun paramètre = tentative de connexion à la page d'accueil.
+            is_authorized = True
+            token = request.headers.get("Authorization")[4:]
+            #return Response({"error": "Domaine invalide. Veuillez vérifier vos headers"}, status=status.HTTP_400_BAD_REQUEST)
 
-        host = request.headers.get("X-Requested-Host") # Lecture du domaine d'origine depuis les headers
-        host_split = host.split(".")
-        host_suffix = "." + host_split[1] + "." + host_split[2]
-        token = request.headers.get("Authorization")[4:]
-        domain = Domaine.objects.filter(url=host).first()
+        else: # Paramètre existant = tentative de connexion à une URL précise.
+            host = request.headers.get("X-Requested-Host") # Lecture du domaine d'origine depuis les headers
+            if host[-1] == "/":
+                host = host[:-1]  # Supprimer le slash final si présent
 
-        if not domain :
-            return Response({"error": f"Le domaine {host} est introuvable."},status=status.HTTP_404_NOT_FOUND)
+            '''host_split_subdomain = host.split("/")[0] DEPRECATED, à utiliser si on doit gérer des domaines autres qu'Espificio.com
+            host_split_root = host_split_subdomain.split(".")[1:]
+            host_suffix = "." + ".".join(host_split_root)'''
 
-        is_authorized = ProfilUtilisateur.objects.filter(Q(utilisateur=request.user), Q(domaines=domain)).exists()
+            token = request.headers.get("Authorization")[4:]
+            domain = Domaine.objects.filter(url=host).first() # Chercher le domaine correspondant dans la base de données
+            
+            if not domain :
+                return Response({"error": f"Le domaine {host} est introuvable."},status=status.HTTP_404_NOT_FOUND)
+
+            is_authorized = ProfilUtilisateur.objects.filter(Q(utilisateur=request.user), Q(domaines=domain)).exists()
 
         if is_authorized :
             response = Response({"message": "Autorisation réussie avec succès."},status=status.HTTP_200_OK)
@@ -99,7 +113,7 @@ class AuthorizeView(GenericAPIView):# GET response
                 httponly=True,
                 secure=not settings.DEBUG,
                 samesite="Lax",
-                domain= host_suffix,
+                domain= '.espificio.com',
                 max_age=3600
             )
             return response
@@ -121,7 +135,8 @@ class CheckCookieView(GenericAPIView):
             print("[INFO] No session_auth cookie found.")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try :
-            AccessToken(token)
+            decoded = AccessToken(token)
+            console.log("decoded")
         except TokenError:
             print("[INFO] Invalid token in session_auth cookie.")
             return Response(status=status.HTTP_401_UNAUTHORIZED)

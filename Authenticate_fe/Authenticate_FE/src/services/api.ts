@@ -88,6 +88,7 @@ export class ApiService {
         const response = await this.#axiosInstance.get("/core/theme/me/");
         return response.data;
     }
+
     async postActivation(uid: string, token: string) {
         const response = await this.#axiosInstance.post("/users/auth/activation/", { "uid": uid, "token": token });
         return response.data;
@@ -102,6 +103,11 @@ export class ApiService {
     }
     async postPasswordForgotten(email: string) { // Inutilisé
         const response = await this.#axiosInstance.post("/users/auth/users/reset_password/", { "email": email });
+        return response.data;
+    }
+
+    async getUserDomains() {
+        const response = await this.#axiosInstance.get("/core/domaine/me/");
         return response.data;
     }
 }

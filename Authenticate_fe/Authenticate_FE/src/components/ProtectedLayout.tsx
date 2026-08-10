@@ -39,7 +39,7 @@ export default function ProtectedLayout(props: Props) {
 
   return (
     <>
-      <title>{`${appName} - ${brandName}`}</title>
+      <title>{`${appName} ${brandName}`}</title>
       <Box background="white">
         <Container height="64px">
           <Flex justify="space-between" align="center" height="full">

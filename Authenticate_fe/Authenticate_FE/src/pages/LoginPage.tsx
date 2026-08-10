@@ -44,7 +44,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       await login(email!, password!);
-      await authorize(host);
+      await authorize(host); // l'utilisateur est déjà authentifié. On 
       redirectToExternalUrl(host);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -67,7 +67,8 @@ export default function LoginPage() {
           default:
             setError(`Une erreur est survenue (${error.status || error.code})`);
         }
-      } else {
+      }
+      else {
         showBoundary(error);
       }
     } finally {
@@ -75,10 +76,8 @@ export default function LoginPage() {
     }
   }
 
-  if (user) {
-    //redirectToExternalUrl('http://www.test.espificio.com')
-    console.log("Wow, user!")
-    //return <Navigate to="/" replace />;
+  if (user && host === undefined) {
+    return <Navigate to="/" replace />;
   }
 
   return (
@@ -91,7 +90,7 @@ export default function LoginPage() {
           <Fieldset.Content gap={4}>
             <Field.Root invalid={!!emailError || !!error}>
               <Field.Label fontSize="md" fontWeight="bold" ps={3}>
-                Votre e-mail ou mot de passe
+                Votre e-mail ou nom d'utilisateur
               </Field.Label>
               <Input
                 //type="email"
