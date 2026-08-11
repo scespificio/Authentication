@@ -29,7 +29,7 @@ Ce document decrit le code present dans `Authenticate_fe/Authenticate_fe`. Il co
 
 - Frontend React + Vite + TypeScript.
 - UI avec Chakra UI (system v3), webconfig partagée, et polices Switzer.
-- Auth JWT via API backend (Django) et paramétrable en config backend.
+- Auth JWT via API backend (Django) et paramétrable en config backend (application users).
 - Routing avec React Router.
 - Autorisation, redirection vers d'autres domaines avec paramètres de recherches inclus dans l'URL.
 
@@ -58,7 +58,7 @@ Un ErrorBoundary global affiche `ErrorPage` en cas d'erreur.
 
 ### AuthContext (`Authenticate_fe/src/hooks/AuthContext.tsx`)
 
-- Gere l'utilisateur connecte, le login, le logout, l'autorisation d'accès aux domaines et le refresh de token.
+- Gere la connexion utilisateur, le login, le logout, l'autorisation d'accès aux domaines et le refresh de token.
 - Stocke l'utilisateur en localStorage.
 - Expose `ApiService` preconfigure avec le user.
 
@@ -88,6 +88,7 @@ Endpoints utilises:
 - Autorisation: `/core/auth/authorize/`.
 - Config: `/core/theme/me/`.
 - Activation: `/users/auth/activation/`, `/users/auth/resend_activation/`.
+- Domaines: `/core/domaine/me/`
 
 ## Composants principaux
 
@@ -108,7 +109,7 @@ Composants UI reutilises:
 
 ## Pages
 
-- `HomePage` : accueil.
+- `HomePage` : accueil, déconnexion, liens vers les domaines
 - `LoginPage` : authentification (email ou username + MDP).
 - `PasswordForgottenPage` : demande reset password.
 - `AccountActivationPage` : activation compte + resend activation.

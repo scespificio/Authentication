@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 
 from .models import ProfilUtilisateur, Domaine
-from .serializers import ProfileSerializer, DomainSerializer, CoreTokenObtainPairSerializer
+from .serializers import ProfileSerializer, DomainSerializer
 from users.serializers import CustomTokenObtainPairSerializer
 from users.models import User
 from .services import user_has_domain_access

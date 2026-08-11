@@ -13,7 +13,7 @@ Authenticate_be/
 │
 ├── Authenticate/
 │   └── config/           <- configuration Django (settings, urls, wsgi/asgi, celery).
-│   └── core/             <- gestion des profils & sites (profil, domaine).
+│   └── core/             <- gestion des profils & domaines, services.
 │       └── migrations/
 │       └── services/
 │       └── templates/
@@ -34,6 +34,7 @@ Authenticate_be/
 ## Vue d'ensemble
 
 - Projet Django REST (DRF) avec authentification JWT (Djoser) paramétrable via l'application Django packagée `users`.
+- Transmission et vérification de JWT entre sites grâce à des cookies.
 - Base de donnees MySQL, cache/broker Redis, emails SMTP, taches async via Celery.
 - Deux apps locales principales: `core` et `images`.
 - App `tags` externe (fournie par le wheel `django_tags_app-0.1.0-py3-none-any.whl`) utilisee via `tags.models.TaggedItem` et `tags.admin.TagsInline`.
@@ -49,13 +50,13 @@ Fichier: `Authenticate/config/settings.py`
 - Media: `MEDIA_URL=/uploads/`, `MEDIA_ROOT=Authenticate/uploads`.
 - Celery: `CELERY_BROKER_URL` (Redis) et `CELERY_RESULT_BACKEND`.
 - Logging standard console.
-- Securite: `SECURE_SSL_REDIRECT`, `SECURE_PROXY_SSL_HEADER`, `CSRF_TRUSTED_ORIGINS`.
+- Sécurité: `SECURE_SSL_REDIRECT`, `SECURE_PROXY_SSL_HEADER`, `CSRF_TRUSTED_ORIGINS`.
 
 Variables d'environnement (principales):
 
 - Authentification :  `AUTH_USER_MODEL = "users.User"`, `USERS_LOGIN_FIELD = "username" | "email" | "both"` (authentification sur le champ email par défaut.)
 - Django: `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_TIME_ZONE`, `DJANGO_ALLOWED_HOSTS`
-- CORS: `CORS_ALLOWED_ORIGINS`, `CORS_ALLOW_HEADERS` (ajoute le header custom `X-Requested-Host` pour l'autorisation d'accès à un domaine)
+- CORS: `CORS_ALLOWED_ORIGINS`, `CORS_ALLOW_HEADERS` (ajoute le header custom `X-Requested-Host` pour l'autorisation d'accès à un domaine), `CORS_ALLOW_CREDENTIALS` (permet la création de cookies)
 - REST_FRAMEWORK : `DEFAULT_THROTTLE_RATES` (rate limiting : nombre de tentatives de login possibles par minute pour un utilisateur.)
 - DB: `DB_NAME`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`
 - Email: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT`
@@ -72,10 +73,9 @@ URLConf actif (celui reference dans settings): `Authenticate/config/urls.py`
 Routes principales:
 
 - Admin: `/admin/`
-- core API: `/core/` (voir `Authenticate/core/urls.py`)
-- Auth djoser & custom : 
+- core API, domain authorization, JWT check (custom): `/core/` (voir `Authenticate/core/urls.py`)
+- djoser authentication, JWT creation (custom) : 
   - `/users/auth/`
-  - `POST auth/jwt/create/:url` // En cours : endpoint d'authentification custom : vérifie en + si l'url est bien accessible à l'utilisateur.
 - Debug toolbar: `/__debug__/` (en dev)
 - Media: expose en dev via `static()` si `DEBUG=True`
 
@@ -93,9 +93,12 @@ core/
 │   └── me/
 │
 ├── domaine/
+│   └── me/
 │
 └── auth/
     └── authorize/
+    └── jwt/
+        └── check/
 ```
 
 Endpoint custom API users :
@@ -108,6 +111,10 @@ users/
     └── jwt/
           └── create/
 ```
+
+### Services (`Authenticate/core/services.py`)
+
+- `user_has_domain_access` : Vérifie si l'utilisateur a accès au domaine.
 
 ### Models (`Authenticate/core/models.py`)
 
@@ -124,7 +131,9 @@ users/
 - `ProfileView`: renvoie les informations sur les profils utilisateurs.
 - `ProfileViewDetail`: renvoie les informations sur les profils utilisateur associés à l'utilisateur actuellement connecté.
 - `DomainView`: renvoie les informations sur les domaines
-- `AuthorizeView`: vérifie que le domaine demandé fait partie de la liste des autorisations et renvoie une réponse. 
+- `DomainUserView`: renvoie les informations sur les domaines pour lesquels l'utilisateur est accrédité.
+- `AuthorizeView`: vérifie que l'utilisateur est autorisé pour le domaine demandé.
+- `CheckCookieView`: vérifie que le JWT reçu est valide et appartient à un utilisateur autorisé pour le domaine dont provient la demande.
 
 ### Admin (`Authenticate/core/admin.py`)
 
