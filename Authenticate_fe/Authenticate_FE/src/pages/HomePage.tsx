@@ -26,7 +26,6 @@ export default function HomePage() {
 
           if (!ignore) {
             setDomainsList(userRes)
-            console.log("domaines :", userRes)
           }
 
           setLoading(false);

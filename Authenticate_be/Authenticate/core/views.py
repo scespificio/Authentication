@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 from .models import ProfilUtilisateur, Domaine
 from .serializers import ProfileSerializer, DomainSerializer, CoreTokenObtainPairSerializer
 from users.serializers import CustomTokenObtainPairSerializer
+from users.models import User
+from .services import user_has_domain_access
 
 from rest_framework.response import Response
 from rest_framework import permissions, status
@@ -90,20 +92,8 @@ class AuthorizeView(GenericAPIView):# GET response
 
         else: # Paramètre existant = tentative de connexion à une URL précise.
             host = request.headers.get("X-Requested-Host") # Lecture du domaine d'origine depuis les headers
-            if host[-1] == "/":
-                host = host[:-1]  # Supprimer le slash final si présent
-
-            '''host_split_subdomain = host.split("/")[0] DEPRECATED, à utiliser si on doit gérer des domaines autres qu'Espificio.com
-            host_split_root = host_split_subdomain.split(".")[1:]
-            host_suffix = "." + ".".join(host_split_root)'''
-
             token = request.headers.get("Authorization")[4:]
-            domain = Domaine.objects.filter(url=host).first() # Chercher le domaine correspondant dans la base de données
-            
-            if not domain :
-                return Response({"error": f"Le domaine {host} est introuvable."},status=status.HTTP_404_NOT_FOUND)
-
-            is_authorized = ProfilUtilisateur.objects.filter(Q(utilisateur=request.user), Q(domaines=domain)).exists()
+            is_authorized, status_code = user_has_domain_access(request.user, host)
 
         if is_authorized :
             response = Response({"message": "Autorisation réussie avec succès."},status=status.HTTP_200_OK)
@@ -118,10 +108,21 @@ class AuthorizeView(GenericAPIView):# GET response
             )
             return response
 
-        else :
+        elif (not is_authorized and status_code == 403) :
             return Response(
                 {"error":f"L'autorisation a échoué : vous n'avez pas accès à {host}"},
-                status=status.HTTP_401_UNAUTHORIZED
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        elif (not is_authorized and status_code == 404) :
+            return Response(
+                {"error": f"Le domaine {host} est introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        else :
+            return Response(
+                {"error" : "Requête invalide."},
+                status=status.HTTP_400_BAD_REQUEST
             )
         
 class CheckCookieView(GenericAPIView):
@@ -129,16 +130,36 @@ class CheckCookieView(GenericAPIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        print("[INFO] Getting into this")
+        if not "X-Request-URI" in request.headers:
+            return Response({"error":"Domaine invalide. Veuillez vérifier vos headers."}, status=status.HTTP_400_BAD_REQUEST)
+        if not "session_auth" in request.COOKIES:
+            return Response({"error":"Le cookie session_auth est introuvable. Veuillez vérifier vos cookies"}, status=status.HTTP_401_UNAUTHORIZED)
+
         token = request.COOKIES.get("session_auth")
-        if not token:
-            print("[INFO] No session_auth cookie found.")
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        host = request.headers.get("X-Request-URI")
+
         try :
-            decoded = AccessToken(token)
-            console.log("decoded")
+            decoded = AccessToken(token) # This will raise an exception if the token is invalid.
+            decoded = decoded.payload
+            user_id = decoded.get("user_id") 
+            user = User.objects.filter(id=user_id).first()
+
+            is_authorized, status_code = user_has_domain_access(user, host)
+
         except TokenError:
-            print("[INFO] Invalid token in session_auth cookie.")
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        print("[INFO] Something else happened.")
-        return Response(status=status.HTTP_200_OK)
+            return Response({"error": "Invalid token."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if is_authorized :
+            return Response({"message": "Success!"}, status=status.HTTP_200_OK)
+
+        elif (not is_authorized and status_code == 403) :
+            return Response({"error":f"L'autorisation a échoué : vous n'avez pas accès à {host}"}, status=status.HTTP_403_FORBIDDEN)
+
+        elif (not is_authorized and status_code == 404) :
+            return Response({"error": f"Le domaine {host} est introuvable."}, status=status.HTTP_404_NOT_FOUND)
+
+        else :
+            return Response(
+                {"error" : "Requête invalide."},
+                status=status.HTTP_400_BAD_REQUEST
+            )

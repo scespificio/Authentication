@@ -44,8 +44,10 @@ export default function LoginPage() {
     try {
       setLoading(true);
       await login(email!, password!);
-      await authorize(host); // l'utilisateur est déjà authentifié. On 
-      redirectToExternalUrl(host);
+      await authorize(host);
+      if (user && host !== undefined) {
+        redirectToExternalUrl(host);
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
         switch (error.status) {
@@ -58,6 +60,10 @@ export default function LoginPage() {
             break;
           case 401: {
             setError("Identifiants ou droits d'accès invalides.");
+            break;
+          }
+          case 403: {
+            setError("Vous n'avez pas les droits d'accès à ce domaine.");
             break;
           }
           case 404: {
@@ -76,7 +82,7 @@ export default function LoginPage() {
     }
   }
 
-  if (user && host === undefined) {
+  if (user && host === undefined) { // aucun paramètre de recherche renseigné : l'utilisateur est redirigé à la page d'accueil.
     return <Navigate to="/" replace />;
   }
 
