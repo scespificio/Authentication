@@ -8,10 +8,18 @@ django.setup()
 
 # Only import models AFTER django.setup()
 from django.contrib.auth import get_user_model
-from core.models import ProfilUtilisateur, Domaine
+from core.models import ProfilUtilisateur, Domaine #, UtilisateurExtension
 from users.models import User
 
 User = get_user_model()
+
+def handle(self, *args, **options):
+    created_count = 0
+    '''for user in User.objects.all():
+        _, created = UtilisateurExtension.objects.get_or_create(user=user)
+        if created:
+            created_count += 1
+    print(f"Created {created_count} extension(s).")'''
 
 def create_superuser():
     if User.objects.filter(email='admin@espificio.com').exists():
@@ -31,14 +39,14 @@ def create_superuser():
 
 def create_domains():    
     domain, _ = Domaine.objects.get_or_create(
-        nom='CRAOnline',
+        nom='CRAOnline (test)',
         url='craonline.espificio.com'
     ) 
 
-    if Domaine.objects.filter(nom='CRAOnline').exists():
+    if Domaine.objects.filter(nom='CRAOnline (test)').exists():
         print("Domain already exists.")
     else:
-         print("Created domain ", domain.url)
+        print("Created domain ", domain.url)
 
     return domain
 
@@ -48,7 +56,6 @@ def create_profile(superuser, domain):
         return
 
     profile, _ = ProfilUtilisateur.objects.get_or_create(
-        utilisateur = superuser,
         nom='admin'
     )
 
@@ -62,6 +69,7 @@ def main():
         superuser = create_superuser()
         domain = create_domains()
         create_profile(superuser, domain)
+        handle(None)
 
         print("\nDone! Login credentials:")
         print("Email: admin@espificio.com")

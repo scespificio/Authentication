@@ -6,3 +6,4 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         print("[apps.ready] core loaded", flush=True)  # trace visible au boot
+        #import core.signals

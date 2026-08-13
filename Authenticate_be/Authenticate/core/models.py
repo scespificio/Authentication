@@ -1,11 +1,14 @@
+from django.conf import settings
 from django.db import models
-import users
 
-# Create your models here.
 
 class Domaine(models.Model):
     nom = models.CharField(max_length=100)
-    url = models.CharField(unique=True, max_length=100)
+    url = models.CharField(
+        unique=True,
+        max_length=100,
+        help_text="Renseigner sous la forme DOMAINE/SOUS-DOMAINE sans '/' à la fin.",
+    )
 
     def __str__(self) -> str:
         return self.nom
@@ -15,19 +18,40 @@ class Domaine(models.Model):
         verbose_name_plural = "Domaines"
 
 
-class ProfilUtilisateur(models.Model):
-    utilisateur = models.ForeignKey(users.models.User, on_delete=models.CASCADE) # A modifier  : Plusieurs utilisateurs peuvent avoir le même profil_u VOIR AVEC STEVE SI L'INVERSE EST PAS PLUS LOGIQUE.
-    nom = models.CharField(max_length=100)
+class DroitUtilisateur(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="authenticate_profile",
+    )
+    # nom = models.CharField(max_length=100)
     domaines = models.ManyToManyField(
         "Domaine",
         blank=True,
-        related_name="profils",
+        related_name="droits",
         verbose_name="Domaines autorisés",
     )
 
     def __str__(self) -> str:
-        return self.nom
+        return str(self.user)
 
     class Meta:
-        verbose_name = "Profil Utilisateur"
-        verbose_name_plural = "Profils Utilisateur"
+        verbose_name = "Droit Utilisateur"
+        verbose_name_plural = "Droits Utilisateur"
+
+
+"""class UtilisateurExtension(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="utilisateur_extension",
+    )>
+    profil = models.ForeignKey(
+        ProfilUtilisateur,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self) -> str:
+        return str(self.user)"""
