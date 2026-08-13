@@ -7,4 +7,6 @@ docker-compose*.yml
 npm-debug.log*
 yarn.lock
 pnpm-lock.yaml
+.venv/
+.vscode/
 

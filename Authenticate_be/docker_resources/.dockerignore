@@ -11,4 +11,5 @@ staticfiles/
 node_modules/
 .ruff_cache/
 .venv/
+.vscode/
 
