@@ -18,7 +18,7 @@ interface Props {
 
 export function HostProvider(props: Props) {
     const [loading, setLoading] = useState(true);
-    const [host, setHost] = useState(undefined);
+    const [host, setHost] = useState<string | undefined>(undefined);
     const location = useLocation();
 
     const value: HostContextType = { host };

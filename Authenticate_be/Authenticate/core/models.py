@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 
-class Domaine(models.Model):
+class Domain(models.Model):
     nom = models.CharField(max_length=100)
     url = models.CharField(
         unique=True,
@@ -18,7 +18,7 @@ class Domaine(models.Model):
         verbose_name_plural = "Domaines"
 
 
-class DroitUtilisateur(models.Model):
+class UserIAM(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -26,7 +26,7 @@ class DroitUtilisateur(models.Model):
     )
     # nom = models.CharField(max_length=100)
     domaines = models.ManyToManyField(
-        "Domaine",
+        Domain,
         blank=True,
         related_name="droits",
         verbose_name="Domaines autorisés",
@@ -38,20 +38,3 @@ class DroitUtilisateur(models.Model):
     class Meta:
         verbose_name = "Droit Utilisateur"
         verbose_name_plural = "Droits Utilisateur"
-
-
-"""class UtilisateurExtension(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="utilisateur_extension",
-    )>
-    profil = models.ForeignKey(
-        ProfilUtilisateur,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-
-    def __str__(self) -> str:
-        return str(self.user)"""

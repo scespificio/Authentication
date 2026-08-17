@@ -20,12 +20,13 @@ export default defineConfig(({ mode }): UserConfig => {
 
   // Gestion des hosts autorisés en dev (ne sert pas en prod)
   const allowedHosts = env.ALLOWED_HOST
-    ? env.ALLOWED_HOST.split(',').map(h => h.trim())
+    ? env.ALLOWED_HOST.split(',')
+        .map((host) => host.trim())
+        .filter(Boolean)
     : ['localhost']
 
   return {
     base,
-
     plugins: [react(), tsconfigPaths()],
 
     // ❗ Cette section est utilisée uniquement en DEV

@@ -41,7 +41,7 @@ FROM nginx:1.27-alpine AS prod
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Conf nginx + entrypoint
-COPY docker_resources/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker_resources/nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY docker_resources/entrypoint.sh /docker_resources/entrypoint.sh
 
 RUN chmod +x /docker_resources/entrypoint.sh
@@ -49,5 +49,5 @@ RUN chmod +x /docker_resources/entrypoint.sh
 # On copie le build Vite
 COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 880
+EXPOSE 80
 ENTRYPOINT ["/docker_resources/entrypoint.sh"]

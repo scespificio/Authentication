@@ -22,8 +22,7 @@ export default function LoginPage() {
   const { showBoundary } = useErrorBoundary();
 
   const redirectToExternalUrl = (host: string) => {
-    const url = "http://" + host
-    window.location.href = url
+    window.location.replace(`https://${host}`)
   };
 
   function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -44,8 +43,9 @@ export default function LoginPage() {
     try {
       setLoading(true);
       await login(email!, password!);
-      await authorize(host);
-      if (user && host !== undefined) {
+//
+      if (host !== undefined) {
+        await authorize(host);
         redirectToExternalUrl(host);
       }
     } catch (error) {

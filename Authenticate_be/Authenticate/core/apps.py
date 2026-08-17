@@ -1,9 +1,10 @@
 from django.apps import AppConfig
 
+
 class CoreConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'core'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "core"
 
     def ready(self):
         print("[apps.ready] core loaded", flush=True)  # trace visible au boot
-        #import core.signals
+        # import core.signals

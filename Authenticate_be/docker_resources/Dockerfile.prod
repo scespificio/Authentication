@@ -17,15 +17,15 @@ RUN apt-get update && apt-get install -y \
 
 
 COPY django_tags_app-0.1.0-py3-none-any.whl /tmp/django_tags_app-0.1.0-py3-none-any.whl
+COPY django_users_apps-0.1.1-py3-none-any.whl /tmp/django_users_apps-0.1.1-py3-none-any.whl
 
 RUN set -euo pipefail \
     && pip install --no-cache-dir -r requirement.in \
     && pip install --no-cache-dir /tmp/django_tags_app-0.1.0-py3-none-any.whl \
+    && pip install --no-cache-dir /tmp/django_users_apps-0.1.1-py3-none-any.whl \
     && rm -f /tmp/django_tags_app-0.1.0-py3-none-any.whl \
+    && rm -f /tmp/django_users_apps-0.1.1-py3-none-any.whl \
     && find /app -type d -name "__pycache__" -exec rm -rf {} +
 
-COPY prodentrypoint.sh /app/prodentrypoint.sh
-RUN chmod +x /app/prodentrypoint.sh
 EXPOSE 5190
 
-ENTRYPOINT ["/app/prodentrypoint.sh"]

@@ -1,22 +1,41 @@
-import React from 'react'
+import { createContext, type ReactNode, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
-import { createContext, useContext } from "react";
 
-const BreakpointContext = createContext(null)
+type BreakpointContextType = {
+  isDesktopOrLaptop: boolean;
+  isTabletOrMobile: boolean;
+};
 
-const ContextDevice = ({ children }) => {
-    const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1223px)' })
-    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+const BreakpointContext = createContext<BreakpointContextType | null>(null);
 
-    return (
-        <BreakpointContext.Provider value={{ isDesktopOrLaptop, isTabletOrMobile }}>
-            {children}
-        </BreakpointContext.Provider>
-    )
+const ContextDevice = ({ children }: { children: ReactNode }) => {
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1223px)",
+  });
+
+  const isTabletOrMobile = useMediaQuery({
+    query: "(max-width: 1224px)",
+  });
+
+  return (
+    <BreakpointContext.Provider
+      value={{ isDesktopOrLaptop, isTabletOrMobile }}
+    >
+      {children}
+    </BreakpointContext.Provider>
+  );
+};
+
+export function useBreakpoint(): BreakpointContextType {
+  const context = useContext(BreakpointContext);
+
+  if (context === null) {
+    throw new Error(
+      "useBreakpoint doit être utilisé dans un ContextDevice",
+    );
+  }
+
+  return context;
 }
 
-export function useBreakpoint() {
-    return useContext(BreakpointContext);
-}
-
-export default ContextDevice
+export default ContextDevice;
