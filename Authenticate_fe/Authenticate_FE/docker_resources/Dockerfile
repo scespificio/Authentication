@@ -9,8 +9,8 @@ RUN npm ci
 COPY . .
 
 # Vite en dev sur PORT
-EXPOSE 5193
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5193"] 
+EXPOSE 880
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "880"] 
 
 
 # ---------- STAGE BUILD : build Vite ----------

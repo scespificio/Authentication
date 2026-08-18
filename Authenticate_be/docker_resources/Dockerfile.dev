@@ -29,11 +29,11 @@ RUN set -euo pipefail \
 
 # Dossier des logs (si nécessaire)
 RUN mkdir -p /app/save
-EXPOSE 5190 
+EXPOSE 5200 
 
 VOLUME ["/app/save"]
 
 # Django : bind sur 0.0.0.0 et log du jour
 #CMD ["bash","-lc","python manage.py runserver 0.0.0.0:PORT | tee -a ./save/$(date +'%Y-%m-%d')_trace.log"]
-CMD ["bash","-lc","python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:5190 | tee -a ./save/$(date +'%Y-%m-%d')_trace.log"]
+CMD ["bash","-lc","python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:5200 | tee -a ./save/$(date +'%Y-%m-%d')_trace.log"]
 

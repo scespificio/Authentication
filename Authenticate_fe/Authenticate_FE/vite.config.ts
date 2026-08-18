@@ -21,8 +21,8 @@ export default defineConfig(({ mode }): UserConfig => {
   // Gestion des hosts autorisés en dev (ne sert pas en prod)
   const allowedHosts = env.ALLOWED_HOST
     ? env.ALLOWED_HOST.split(',')
-        .map((host) => host.trim())
-        .filter(Boolean)
+      .map((host) => host.trim())
+      .filter(Boolean)
     : ['localhost']
 
   return {
@@ -32,7 +32,7 @@ export default defineConfig(({ mode }): UserConfig => {
     // ❗ Cette section est utilisée uniquement en DEV
     server: {
       host: true,
-      port: 5193, // Port DEV uniquement
+      port: 880, // Port DEV uniquement
       strictPort: true,
       allowedHosts,
     },
