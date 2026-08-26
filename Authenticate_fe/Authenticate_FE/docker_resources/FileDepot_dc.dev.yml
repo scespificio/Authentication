@@ -13,7 +13,7 @@ services:
     image: authenticate_fe:dev
     container_name: authenticate_fe_dev
     ports:
-      - "5193:5193"
+      - "880:880"
     env_file:
       - /home/adminroot/workspace/services/env/Authenticate.env.dev
     environment:

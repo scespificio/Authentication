@@ -8,7 +8,8 @@ import { useConfig } from "./ConfigContext";
 
 interface AuthContextType {
   user?: UserData;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, auth: string) => Promise<void>;
+  loginSSO: () => Promise<void>;
   authorize: (host: string) => Promise<void>
   logout: () => void;
   tokenRefresh: () => void;
@@ -36,8 +37,8 @@ export function AuthProvider(props: Props) {
 
   const apiService = new ApiService(user);
 
-  const handleLogin = async (email: string, password: string) => {
-    setUser(await apiService.login(email, password));
+  const handleLogin = async (email: string, password: string, auth: string) => {
+    auth === "sso" ? setUser(await apiService.loginSSO()) : setUser(await apiService.login(email, password))
     try {
       updateConfig(await apiService.getConfig());
     } catch {

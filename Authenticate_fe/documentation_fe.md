@@ -147,15 +147,15 @@ Note: `docker/entrypoint.sh` genere un `config.js` avec `window.__APP_CONFIG__`,
 
 Fichier: `Authenticate_fe/vite.config.ts`
 
-- Dev server: port `5193`, `allowedHosts` via env `ALLOWED_HOST`.
+- Dev server: port `880`, `allowedHosts` via env `ALLOWED_HOST`.
 - `base` configurable via `VITE_APP_BASE`.
 - `vite-tsconfig-paths` active les alias TypeScript.
 
 ## Docker
 
 - `Authenticate_fe/docker_resources/Dockerfile`:
-  - stage dev: Vite HMR sur `5193`.
+  - stage dev: Vite HMR sur `880`.
   - stage build: `npm run build`.
-  - stage prod: Nginx sert `dist/` sur port `PORT`. // Placeholder ports frontend prod
-- `Authenticate_fe/docker_resources/docker-compose.dev.yml`: map `5193:5193`.
-- `Authenticate_fe/docker_resources/docker-compose.prod.yml`: map `PORT:PORT` // Placeholder ports frontend prod (Nginx interne).
+  - stage prod: Nginx sert `dist/` sur port `80`. //  ports frontend prod
+- `Authenticate_fe/docker_resources/docker-compose.dev.yml`: map `880:880`.
+- `Authenticate_fe/docker_resources/docker-compose.prod.yml`: map `80` //  ports frontend prod (Nginx interne).

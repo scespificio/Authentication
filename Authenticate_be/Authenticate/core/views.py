@@ -21,6 +21,7 @@ load_dotenv()
 
 CONFIG_FOLDER = os.getenv("CONFIG_FILE_FOLDER")
 CONFIG_FILE = os.getenv("CONFIG_FILE_NAME")
+DOMAIN_NAME = os.getenv("DOMAIN_NAME")
 
 
 class ConfigDetailView(ReadOnlyModelViewSet):
@@ -117,7 +118,7 @@ class AuthorizeView(GenericAPIView):  # GET response
                 httponly=True,
                 secure=True,
                 samesite="Lax",
-                domain=".espificio.com",
+                domain=DOMAIN_NAME,
                 path="/",
                 max_age=3600,
             )

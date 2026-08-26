@@ -19,8 +19,20 @@ load_dotenv()
 from .users_settings import (
     ACTIVATION_MAIL_BODY,  # noqa: F401
     AUTH_USER_MODEL,  # noqa: F401
+    LOGIN_REDIRECT_URL,  # noqa: F401
+    LOGOUT_REDIRECT_URL,  # noqa: F401
+    OIDC_AUTHENTICATION_CALLBACK_URL,  # noqa: F401
+    OIDC_OP_AUTHORIZATION_ENDPOINT,  # noqa: F401
+    OIDC_OP_JWKS_ENDPOINT,  # noqa: F401
+    OIDC_OP_TOKEN_ENDPOINT,  # noqa: F401
+    OIDC_OP_USER_ENDPOINT,  # noqa: F401
+    OIDC_REDIRECT_ALLOWED_HOSTS,  # noqa: F401
+    OIDC_RP_CLIENT_ID,  # noqa: F401
+    OIDC_RP_CLIENT_SECRET,  # noqa: F401
+    OIDC_RP_SIGN_ALGO,  # noqa: F401
     USER_GROUP_DISPLAY,  # noqa: F401
     USERS_ENABLE_ACTIVATION_EMAIL,
+    USERS_ENABLE_SSO,  # noqa: F401
     USERS_LOGIN_FIELD,  # noqa: F401
 )
 
@@ -349,6 +361,14 @@ DJOSER = {
     },
 }
 
+# ---------------------------------------------------------
+# JWT
+# ---------------------------------------------------------
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "users.backends.MyOIDCBackend",  # SSO
+]
 
 # ---------------------------------------------------------
 # Password reset
@@ -360,7 +380,6 @@ PASSWORD_RESET_TIMEOUT = int(
         "86400",
     )
 )
-
 
 # ---------------------------------------------------------
 # JWT

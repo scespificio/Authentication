@@ -10,7 +10,9 @@ export class ApiService {
             baseURL: import.meta.env.VITE_BACKEND_URL,
             headers: { "Content-Type": "application/json" },
             timeout: import.meta.env.VITE_BACKEND_TIMEOUT,
-            withCredentials: true,
+            withCredentials: true,       // ensures cookies (session + csrf) are actually sent
+            xsrfCookieName: "csrftoken",
+            xsrfHeaderName: "X-CSRFToken",
         });
         this.#user = user;
 
@@ -66,6 +68,28 @@ export class ApiService {
         this.#user = undefined;
         return this.#user;
     }
+
+    async loginSSO(): Promise<string> {
+        const tokenResponse = await this.#axiosInstance.post("/users/auth/jwt/exchange/")  // on échange le token de session Django obtenu par connexion SSO avec une paire de JWT valide
+        const access_token = tokenResponse.data.access;
+        const refresh_token = tokenResponse.data;
+
+        const userResponse = await this.#axiosInstance.get("/users/auth/users/me/", // on utilise la paire de JWT pour obtenir les informations d'utilisateur
+            { headers: { Authorization: `JWT ${access_token}` } }
+        );
+
+        const userData = userResponse.data
+
+        const user = {
+            ...userData,
+            access_token,
+            refresh_token
+        }
+
+        this.#user = user; // on hydrate le contexte utilisateur avec les informations obtenues
+        return this.#user;
+    }
+
     async refreshToken(): Promise<string> {
         if (!this.#user?.refresh_token) { throw new Error("Missing refresh token"); }
         try {
@@ -84,6 +108,7 @@ export class ApiService {
             throw error;
         }
     }
+
     async getConfig(): Promise<ConfigData> {
         const response = await this.#axiosInstance.get("/core/theme/me/");
         return response.data;
@@ -110,4 +135,5 @@ export class ApiService {
         const response = await this.#axiosInstance.get("/core/domaine/me/");
         return response.data;
     }
+
 }

@@ -12,7 +12,7 @@ Ce document décrit le code present dans `Authenticate_be`. Il couvre l'architec
 Authenticate_be/
 │
 ├── Authenticate/
-│   └── config/           <- configuration Django (settings, urls, wsgi/asgi, celery).
+│   └── theme/           <- configuration Django (settings, urls, wsgi/asgi, celery).
 │   └── core/             <- gestion des profils & domaines, services.
 │       └── migrations/
 │       └── services/
@@ -38,7 +38,7 @@ Authenticate_be/
 - Base de donnees MySQL, cache/broker Redis, emails SMTP, taches async via Celery.
 - Deux apps locales principales: `core` et `images`.
 - App `tags` externe (fournie par le wheel `django_tags_app-0.1.0-py3-none-any.whl`) utilisee via `tags.models.TaggedItem` et `tags.admin.TagsInline`.
-- App `users` externe (fournie par le wheel `django_users_apps-0.1.0-py3-none-any.whl`) utilisee via `users.models.User`, `users.serializers`, `users.views`, `users.emails` et `users.urls`.
+- App `users` externe (fournie par le wheel `django_users_apps-0.1.2-py3-none-any.whl`) utilisee via `users.models.User`, `users.serializers`, `users.views`, `users.emails` et `users.urls`.
 
 ## Configuration Django (Authenticate)
 
@@ -61,6 +61,7 @@ Variables d'environnement (principales):
 - DB: `DB_NAME`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`
 - Email: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT`
 - Config : `CONFIG_FILE_FOLDER`, `CONFIG_FILE_NAME`
+- Cookies : `DOMAIN_NAME` (définit le domaine de validité du cookie d'authentification)
 - Front: `FRONTEND_BASE_URL`, `FRONTEND_DOMAIN`, `FRONTEND_PROTOCOL`
 - JWT: `ACCESS_TOKEN_LIFETIME`, `REFRESH_TOKEN_LIFETIME`
 - Celery: `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`
