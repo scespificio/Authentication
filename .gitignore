@@ -114,3 +114,6 @@ tmp/
 # ==========================
 .venv/
 
+# Ignore reset bsh files
+reset_*.sh
+reset.sh
