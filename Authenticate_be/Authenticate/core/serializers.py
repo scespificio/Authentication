@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from rest_framework.serializers import ModelSerializer, ReadOnlyField
 
 from .models import Domain, UserIAM
@@ -8,7 +10,7 @@ class ProfileSerializer(ModelSerializer):
 
     class Meta:
         model = UserIAM
-        fields = ["utilisateur_nom", "nom"]
+        fields: ClassVar[list[str]] = ["utilisateur_nom", "nom"]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

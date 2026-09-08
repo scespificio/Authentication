@@ -1,7 +1,10 @@
-# images/forms.py
+from typing import ClassVar  # noqa: EXE002
+
 from django import forms
+
 from .models import Image
 from .widgets import MultiFileWidget
+
 
 class ImageAdminAddForm(forms.ModelForm):
     image_file = forms.ImageField(
@@ -14,9 +17,10 @@ class ImageAdminAddForm(forms.ModelForm):
     class Meta:
         model = Image
         fields = ("title", "image_file")
-        help_texts = {
+        help_texts: ClassVar[dict[str]] = {
             "title": "Optionnel : servira de préfixe. Si vide, le titre = nom du fichier.",
         }
+
 
 class MultipleFileField(forms.Field):
     widget = MultiFileWidget
@@ -41,10 +45,9 @@ class MultipleFileField(forms.Field):
 
 class BatchImageUploadForm(forms.Form):
     files = MultipleFileField(
-        label="Images",
-        help_text="Sélectionnez une ou plusieurs images."
+        label="Images", help_text="Sélectionnez une ou plusieurs images."
     )
     common_title_prefix = forms.CharField(
         label="Préfixe commun pour le titre",
-        required=False, 
+        required=False,
     )

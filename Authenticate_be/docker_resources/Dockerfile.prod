@@ -27,5 +27,5 @@ RUN set -euo pipefail \
     && rm -f /tmp/django_users_apps-0.1.1-py3-none-any.whl \
     && find /app -type d -name "__pycache__" -exec rm -rf {} +
 
-EXPOSE 5190
+EXPOSE 900
 

@@ -1,6 +1,8 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from .models import ImageItem, Image
-from rest_framework.relations import PrimaryKeyRelatedField
+from rest_framework.relations import PrimaryKeyRelatedField  # noqa: EXE002
+from rest_framework.serializers import ModelSerializer
+
+from .models import Image, ImageItem
+
 
 class ImageSerializer(ModelSerializer):
     class Meta:
@@ -13,11 +15,10 @@ class ImageItemSerializer(ModelSerializer):
     Serializer utilisé à l'intérieur de ProductSerializer.
     On expose l'image (lecture) + image_id (écriture).
     """
+
     image = ImageSerializer(read_only=True)
     image_id = PrimaryKeyRelatedField(
-        queryset=Image.objects.all(),
-        source="image",
-        write_only=True
+        queryset=Image.objects.all(), source="image", write_only=True
     )
 
     class Meta:
@@ -29,6 +30,6 @@ class ImageItemSerializer(ModelSerializer):
             "description",
             "display_order",
             "created_at",
-            "image",      # lecture
-            "image_id",   # écriture
+            "image",  # lecture
+            "image_id",  # écriture
         )

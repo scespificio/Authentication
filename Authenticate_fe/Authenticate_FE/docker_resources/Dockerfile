@@ -49,5 +49,5 @@ RUN chmod +x /docker_resources/entrypoint.sh
 # On copie le build Vite
 COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 903
 ENTRYPOINT ["/docker_resources/entrypoint.sh"]

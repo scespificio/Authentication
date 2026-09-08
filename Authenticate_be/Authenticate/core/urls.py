@@ -1,7 +1,7 @@
-from django.urls import path, include
+from django.urls import path  # noqa: EXE002
 from rest_framework import routers
+
 from . import views
-from django.conf import settings
 
 app_name = "core"
 

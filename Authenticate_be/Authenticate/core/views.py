@@ -1,12 +1,13 @@
 import json
 import os
+from typing import ClassVar
 
 from django.conf import settings
 from dotenv import load_dotenv
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework_simplejwt.exceptions import TokenError
@@ -24,7 +25,9 @@ CONFIG_FILE = os.getenv("CONFIG_FILE_NAME")
 
 
 class ConfigDetailView(ReadOnlyModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes: ClassVar[list[type[BasePermission]]] = [
+        permissions.IsAuthenticated
+    ]
     # serializer_class = WebConfigOutputSerializer
     # pas de listing; on garde select_related pour éviter les N+1
     # queryset = WebConfig.objects.select_related("emailTemplate", "ui_template").none()
@@ -141,8 +144,8 @@ class AuthorizeView(GenericAPIView):  # GET response
 
 
 class CheckCookieView(GenericAPIView):
-    authentication_classes = []  # Allows connection without a JWT, from other websites
-    permission_classes = [AllowAny]
+    authentication_classes = []  # Allows connection without a JWT, from other websites  # noqa: RUF012
+    permission_classes: ClassVar[list[type[BasePermission]]] = [AllowAny]
 
     def get(self, request):
         if not "X-Request-URI" in request.headers:
