@@ -3,7 +3,7 @@ name: Build Authenticate Frontend
 on:
   push:
     tags:
-      - "fe-v*"
+      - "iam_fe-v*"
 
 jobs:
   build:
