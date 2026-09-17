@@ -1,9 +1,9 @@
-name: Build Authenticate Frontend
+name: Build Authenticate Backend
 
 on:
   push:
     tags:
-      - "fe-v*"
+      - "be-v*"
 
 jobs:
   build:
@@ -28,15 +28,15 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/espificio/iam_fe
+          images: ghcr.io/espificio/iam_be
           tags: |
             type=ref,event=tag
 
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./docker_resources/Dockerfile
+          context: ./Authenticate_be
+          file: ./Authenticate_be/docker_resources/Dockerfile.prod
           target: prod
           push: true
           tags: ${{ steps.meta.outputs.tags }}
