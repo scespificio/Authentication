@@ -3,7 +3,7 @@ name: Build Authenticate Frontend
 on:
   push:
     tags:
-      - "-vf*"
+      - "fe-v*"
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/scespificio/iam_fe
+          images: ghcr.io/scespificio/iam_
           tags: |
             type=ref,event=tag
 

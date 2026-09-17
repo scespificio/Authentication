@@ -3,7 +3,7 @@ name: Build Authenticate Backend
 on:
   push:
     tags:
-      - "-vb*"
+      - "be-v*"
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/scespificio/iam_be
+          images: ghcr.io/scespificio/iam_
           tags: |
             type=ref,event=tag
 
