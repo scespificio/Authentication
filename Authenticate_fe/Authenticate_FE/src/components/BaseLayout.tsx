@@ -1,3 +1,4 @@
+import type React from "react";
 import { Box, Center, Image } from "@chakra-ui/react";
 import { useBreakpoint } from "./ui/context-device";
 

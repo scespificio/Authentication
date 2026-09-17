@@ -1,3 +1,4 @@
+import type React from "react";
 import { useAuth } from "../hooks/AuthContext";
 import { Navigate, useLocation } from "react-router";
 

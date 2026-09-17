@@ -7,14 +7,15 @@ export interface UserData {
     last_name: string;
     access_token: string;
     refresh_token: string;
-    phone : string;
-    brand : string;
-    code : string;
-    store_name : string;
+    phone: string;
+    brand: string;
+    code: string;
+    store_name: string;
 }
 
 export interface ConfigData {
     appName: string;
+    clientName: string;
     logo: string;
     email: {
         title: string;

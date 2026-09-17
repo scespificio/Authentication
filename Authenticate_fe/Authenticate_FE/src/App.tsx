@@ -1,3 +1,4 @@
+import type React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { BrowserRouter, Outlet, Route, Routes, useLocation } from "react-router";
 import { useLayoutEffect } from "react";

@@ -120,7 +120,6 @@ class AuthorizeView(GenericAPIView):  # GET response
                 httponly=True,
                 secure=True,
                 samesite="Lax",
-                domain=".espificio.com",
                 path="/",
                 max_age=3600,
             )

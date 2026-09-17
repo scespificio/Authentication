@@ -1,3 +1,4 @@
+import type React from "react";
 import { useAuth } from "@/hooks/AuthContext";
 import { useHost } from "@/hooks/HostProvider";
 import { useState } from "react";
@@ -43,12 +44,12 @@ export default function LoginPage() {
     try {
       setLoading(true);
       await login(email!, password!);
-//
+      //
       if (host !== undefined) {
         await authorize(host);
         redirectToExternalUrl(host);
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AxiosError) {
         switch (error.status) {
           case 400:

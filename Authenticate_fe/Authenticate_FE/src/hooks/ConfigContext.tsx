@@ -1,3 +1,4 @@
+import type React from "react";
 import { clientSystem, defaultSystem } from "@/components/ui/theme";
 import type { ConfigData } from "@/types/users";
 import { ChakraProvider, type SystemContext } from "@chakra-ui/react";

@@ -1,3 +1,4 @@
+import type React from "react";
 import { useAuth } from "@/hooks/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -38,7 +39,7 @@ export default function ActivationPage() {
         setMessage(
           "Un email contenant votre un lien d'initialisation de votre mot de passe a été envoyé"
         );
-      } catch (error: unknown) {
+      } catch (error: any) {
         if (error instanceof AxiosError) {
           const status = error.response?.status;
 
@@ -82,7 +83,7 @@ export default function ActivationPage() {
     event.preventDefault();
     try {
       setLoading(true);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AxiosError) {
         switch (error.status) {
           case 400:

@@ -2,7 +2,7 @@
 set -e
 
 # Valeurs par défaut possibles si non fournies par docker-compose
-: "${VITE_BACKEND_URL:=http://localhost:5190}"
+: "${VITE_BACKEND_URL:=http://localhost:900}"
 : "${VITE_BACKEND_TIMEOUT:=5000}"
 : "${ALLOWED_HOST:=localhost,127.0.0.1}"
 

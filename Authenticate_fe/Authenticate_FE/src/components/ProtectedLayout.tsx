@@ -1,22 +1,8 @@
+import type React from "react";
 import { useAuth } from "@/hooks/AuthContext";
 import { useConfig } from "@/hooks/ConfigContext";
-import {
-  Avatar,
-  Badge,
-  Box,
-  Image,
-  Button,
-  Container,
-  Flex,
-  Menu,
-  Portal,
-  Collapsible,
-  useCollapsible,
-} from "@chakra-ui/react";
-import { LuMenu, LuList, LuClipboardList } from "react-icons/lu";
-import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { useErrorBoundary } from "react-error-boundary";
+import { Avatar, Box, Image, Button, Container, Flex, Menu, Portal, Collapsible, useCollapsible } from "@chakra-ui/react";
+import { LuMenu } from "react-icons/lu";
 import { Link, useLocation } from "react-router";
 import { Loader } from "@/components/Loader";
 
@@ -25,13 +11,12 @@ interface Props {
 }
 
 export default function ProtectedLayout(props: Props) {
-  const { showBoundary } = useErrorBoundary();
-  const { user, tokenRefresh, logout, apiService } = useAuth();
+  const { user, logout } = useAuth();
   const { config } = useConfig();
   const location = useLocation();
   const collapsible = useCollapsible();
   const appName = import.meta.env.VITE_APP_NAME || "Authenticate";
-  const brandName = config?.appName || "Authenticate";
+  const brandName = config?.appName || "";
 
   if (!config) {
     return <Loader />;
@@ -45,8 +30,8 @@ export default function ProtectedLayout(props: Props) {
           <Flex justify="space-between" align="center" height="full">
             <Link to="/">
               <Image
-                src={`${import.meta.env.VITE_BACKEND_URL}${config!.logo}`}
-                alt={`Logo ${config!.appName}`}
+                src={`images/${config!.logo}`}
+                alt={`Logo du logo du logo ${config!.clientName}`}
                 height="40px"
               />
             </Link>

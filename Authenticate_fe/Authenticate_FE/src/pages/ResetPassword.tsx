@@ -1,19 +1,8 @@
+import type React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Box,
-  Container,
-  Text,
-  Image,
-  Heading,
-  Button,
-  CardBody,
-  CardRoot,
-  Fieldset,
-  Field,
-} from "@chakra-ui/react";
+import { Text, Button, Fieldset, Field, } from "@chakra-ui/react";
 import { PasswordInput } from "@/components/ui/password-input"; // ✅ nouvelle API toast
-
 
 import { ApiService } from "@/services/api";
 import { AxiosError } from "axios";
@@ -59,7 +48,7 @@ export default function ResetPassword() {
         setTimeout(() => {
           navigate("/", { replace: true });
         }, 2000);
-      } catch (error: unknown) {
+      } catch (error: any) {
         if (error instanceof AxiosError) {
           const status = error.response?.status;
           if (!status) {
@@ -81,7 +70,7 @@ export default function ResetPassword() {
 
   return (
 
-    <AccountLayout      
+    <AccountLayout
       title="Initialiser votre mot de passe"
       subtitle="Veuillez saisir et confirmer votre mot de passe"
     >
@@ -90,34 +79,34 @@ export default function ResetPassword() {
         <Fieldset.Root>
           <Field.Root required>
             <Field.Label>Nouveau mot de passe</Field.Label>
-              <PasswordInput
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                visible={visible}
-                onVisibleChange={setVisible}
-                autoComplete="new-password"
-                name="new-password"
-              />
-                </Field.Root>
-                <Field.Root required>
-                  <Field.Label>Confirmer le mot de passe</Field.Label>
-                  <PasswordInput
-                    value={confirm}
-                    onChange={(e) => setConfirm(e.target.value)}
-                    autoComplete="new-password"
-                    name="new-password"
-                  />
-                </Field.Root>
-              </Fieldset.Root>
+            <PasswordInput
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              visible={visible}
+              onVisibleChange={setVisible}
+              autoComplete="new-password"
+              name="new-password"
+            />
+          </Field.Root>
+          <Field.Root required>
+            <Field.Label>Confirmer le mot de passe</Field.Label>
+            <PasswordInput
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              autoComplete="new-password"
+              name="new-password"
+            />
+          </Field.Root>
+        </Fieldset.Root>
 
-              <Button type="submit" colorScheme="orange" w="full" mt={4}>
-                Réinitialiser
-              </Button>
-              <Text textAlign="center" color="primary" whiteSpace="pre-line"
-  fontWeight="bold">
-              <br />
-              <b>{message}</b> </Text>
-        </form>
+        <Button type="submit" colorScheme="orange" w="full" mt={4}>
+          Réinitialiser
+        </Button>
+        <Text textAlign="center" color="primary" whiteSpace="pre-line"
+          fontWeight="bold">
+          <br />
+          <b>{message}</b> </Text>
+      </form>
     </AccountLayout>
   );
 }

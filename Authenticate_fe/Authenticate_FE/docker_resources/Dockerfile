@@ -44,10 +44,11 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY docker_resources/nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY docker_resources/entrypoint.sh /docker_resources/entrypoint.sh
 
-RUN chmod +x /docker_resources/entrypoint.sh
+RUN chmod +x /docker_resources/entrypoint.sh \
+    && apk add --no-cache curl nano
 
 # On copie le build Vite
 COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 903
+EXPOSE 80
 ENTRYPOINT ["/docker_resources/entrypoint.sh"]

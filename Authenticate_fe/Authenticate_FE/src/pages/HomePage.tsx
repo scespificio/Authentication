@@ -1,14 +1,6 @@
 import Page from "@/components/Page";
 import { useAuth } from "@/hooks/AuthContext";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  Image,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Heading, Image, Text } from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
@@ -37,7 +29,7 @@ export default function HomePage() {
             setDomainsList(userRes);
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         if (!ignore) {
           if (error instanceof AxiosError && error.status === 401) {
             logout();
@@ -110,7 +102,7 @@ export default function HomePage() {
         </Text>
 
         <Flex direction="column" gap={3}>
-          {domainsList.map((domain) => {
+          {domainsList.map((domain: any) => {
             const urlFull = `https://${domain.url}`;
             const icon = getDomainStatusIcon(domain.id);
             const domainName = domain.nom.split("/").slice(-1)[0];

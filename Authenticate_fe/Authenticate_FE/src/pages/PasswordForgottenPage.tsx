@@ -1,16 +1,9 @@
+import type React from "react";
 import { useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import { Link } from "react-router";
 
-import {
-  Box, Text,
-  Button,
-  Field,
-  Fieldset,
-  Input,
-  Stack,
-  Link as ChakraLink,
-} from "@chakra-ui/react";
+import { Box, Text, Button, Field, Fieldset, Input, Stack, Link as ChakraLink, } from "@chakra-ui/react";
 
 import AccountLayout from "@/components/AccountLayout";
 import { ApiService } from "@/services/api";
@@ -44,7 +37,7 @@ export default function PasswordForgottenPage() {
         "Un email contenant un lien d'initialisation de votre mot de passe a été envoyé."
       );
 
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AxiosError) {
         const status = error.response?.status;
 

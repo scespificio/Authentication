@@ -40,14 +40,14 @@ export interface PasswordVisibilityProps {
 
 export interface PasswordInputProps
   extends InputProps,
-    PasswordVisibilityProps {
+  PasswordVisibilityProps {
   rootProps?: GroupProps
 }
 
 export const PasswordInput = React.forwardRef<
   HTMLInputElement,
   PasswordInputProps
->(function PasswordInput(props, ref) {
+>(function PasswordInput(props: any, ref: any) {
   const {
     rootProps,
     defaultVisible,
@@ -70,7 +70,7 @@ export const PasswordInput = React.forwardRef<
       endElement={
         <VisibilityTrigger
           disabled={rest.disabled}
-          onPointerDown={(e) => {
+          onPointerDown={(e: any) => {
             if (rest.disabled) return
             if (e.button !== 0) return
             e.preventDefault()
@@ -92,7 +92,7 @@ export const PasswordInput = React.forwardRef<
 })
 
 const VisibilityTrigger = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  function VisibilityTrigger(props, ref) {
+  function VisibilityTrigger(props: any, ref: any) {
     return (
       <IconButton
         tabIndex={-1}
@@ -117,7 +117,7 @@ interface PasswordStrengthMeterProps extends StackProps {
 export const PasswordStrengthMeter = React.forwardRef<
   HTMLDivElement,
   PasswordStrengthMeterProps
->(function PasswordStrengthMeter(props, ref) {
+>(function PasswordStrengthMeter(props: any, ref: any) {
   const { max = 4, value, ...rest } = props
 
   const percent = (value / max) * 100

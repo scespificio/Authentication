@@ -7,7 +7,7 @@ export class ApiService {
 
     constructor(user?: UserData) {
         this.#axiosInstance = axios.create({
-            baseURL: import.meta.env.VITE_BACKEND_URL,
+            baseURL: "",
             headers: { "Content-Type": "application/json" },
             timeout: import.meta.env.VITE_BACKEND_TIMEOUT,
             withCredentials: true,
