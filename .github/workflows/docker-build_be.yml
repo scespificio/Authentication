@@ -3,7 +3,7 @@ name: Build Authenticate Backend
 on:
   push:
     tags:
-      - "-v*"
+      - "-vb*"
 
 jobs:
   build:
