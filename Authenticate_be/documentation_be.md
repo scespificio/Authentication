@@ -13,9 +13,8 @@ Authenticate_be/
 │
 ├── src/
 │   └── theme/           <- configuration Django (settings, urls, wsgi/asgi, celery).
-│   └── core/             <- gestion des profils & domaines, services.
+│   └── core/             <- gestion de la config du site.
 │       └── migrations/
-│       └── services/
 │       └── templates/
 │   └── images/           <- gestion des images, admin, upload en lot. // temporaire
 │       └── migrations/
@@ -33,12 +32,11 @@ Authenticate_be/
 
 ## Vue d'ensemble
 
-- Projet Django REST (DRF) avec authentification JWT (Djoser) paramétrable via l'application Django packagée `users`.
-- Transmission et vérification de JWT entre sites grâce à des cookies.
+- Projet Django REST (DRF) avec authentification manuelle JWT (Djoser) et SSO, transmission et vérification de JWT entre sites grâce à des cookies. paramétrable via l'application Django packagée `users`.
 - Base de donnees MySQL, cache/broker Redis, emails SMTP, taches async via Celery.
 - Deux apps locales principales: `core` et `images`.
 - App `tags` externe (fournie par le wheel `django_tags_app-0.1.0-py3-none-any.whl`) utilisee via `tags.models.TaggedItem` et `tags.admin.TagsInline`.
-- App `users` externe (fournie par le wheel `django_users_apps-0.1.2-py3-none-any.whl`) utilisee via `users.models.User`, `users.serializers`, `users.views`, `users.emails` et `users.urls`.
+- App `users` externe (fournie par le wheel `django_users_apps-0.1.3-py3-none-any.whl`) pour le login manuel/SSO et la gestion d'accès aux domaines via cookies de session.
 
 ## Configuration Django (Authenticate)
 
@@ -61,7 +59,6 @@ Variables d'environnement (principales):
 - DB: `DB_NAME`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`
 - Email: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`, `EMAIL_TIMEOUT`
 - Config : `CONFIG_FILE_FOLDER`, `CONFIG_FILE_NAME`
-- Cookies : `DOMAIN_NAME` (définit le domaine de validité du cookie d'authentification)
 - Front: `FRONTEND_BASE_URL`, `FRONTEND_DOMAIN`, `FRONTEND_PROTOCOL`
 - JWT: `ACCESS_TOKEN_LIFETIME`, `REFRESH_TOKEN_LIFETIME`
 - Celery: `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`
@@ -75,8 +72,6 @@ Routes principales:
 
 - Admin: `/admin/`
 - core API, domain authorization, JWT check (custom): `/core/` (voir `src/core/urls.py`)
-- djoser authentication, JWT creation (custom) : 
-  - `/users/auth/`
 - Debug toolbar: `/__debug__/` (en dev)
 - Media: expose en dev via `static()` si `DEBUG=True`
 
@@ -87,102 +82,29 @@ core/
 │
 ├── home/
 │
-├── theme/
-│   └── me/
-│
+└── theme/
+    └── me/
+```
+
+Endpoints API users :
+
+```
+users/
+└──  auth/
+    └── authorize/
+    └── activation/
+    └── resend_activation/
+    └── jwt/
+          └── create/
+          └── check/
 ├── profil/
 │   └── me/
 │
 ├── domaine/
 │   └── me/
 │
-└── auth/
-    └── authorize/
-    └── jwt/
-        └── check/
+└── oidc/
 ```
-
-Endpoint custom API users :
-
-```
-users/
-└──  auth/
-    └── activation/
-    └── resend_activation/
-    └── jwt/
-          └── create/
-```
-
-### Services (`src/core/services.py`)
-
-- `user_has_domain_access` : Vérifie si l'utilisateur a accès au domaine.
-
-### Models (`src/core/models.py`)
-
-- `ProfilUtilisateur`: . Champs:  `nom`, `utilisateur` (FK vers `User`), `domaines` (FK ManyToMany vers `Domaine`)
-- `Domaine`: Champs: `nom`, `url`.
-
-### Serializers (`src/core/serializers.py`)
-
-- `DomainSerializer`: informations de base sur le domaine.
-- `ProfileSerializer`: informations de base sur le profil utilisateur.
-
-### Views (`src/core/views.py`)
-
-- `ProfileView`: renvoie les informations sur les profils utilisateurs.
-- `ProfileViewDetail`: renvoie les informations sur les profils utilisateur associés à l'utilisateur actuellement connecté.
-- `DomainView`: renvoie les informations sur les domaines
-- `DomainUserView`: renvoie les informations sur les domaines pour lesquels l'utilisateur est accrédité.
-- `AuthorizeView`: vérifie que l'utilisateur est autorisé pour le domaine demandé.
-- `CheckCookieView`: vérifie que le JWT reçu est valide et appartient à un utilisateur autorisé pour le domaine dont provient la demande.
-
-### Admin (`src/core/admin.py`)
-
-- Admin `ProfilUtilisateur`
-- Admin `Domaine`
-
-## App `users`
-
-### Models (`src/users/models.py`)
-
-- `User`: remplace `username` par `email` (auth). Champs: `is_staff`, `is_superuser`
-- `EmailTemplate`: modèle d'email (title, content, footer, description).
-
-### Serializers (`src/users/serializers.py`)
-
-- `UserCreateSerializer`, `UserSerializer`: base Djoser adaptee a l'email 
-- `CustomTokenObtainPairSerializer`: login JWT qui renvoie le users et les tokens : contourne la fonction django validate() ; utilise `USERS_LOGIN_FIELD` pour déterminer le champ utilisateur. Quand `USERS_LOGIN_FIELD = "both"`, cherche une correspondence sur les deux champs `username` et `email`.
-
-### Views (`src/users/views.py`)
-
-- `CustomTokenObtainPairView`: endpoint JWT custom : implémente manuellement le throttling et dépend de `DEFAULT_THROTTLE_RATES`.
-- `ActivationView`: active un compte et envoie un email de reset mot de passe.
-- `ActivationResendView`: renvoie un lien d'activation.
-
-### Admin (`src/users/admin.py`)
-
-- Custom admin pour `User` (login email) + action "Envoyer un e-mail d'activation".
-- Admin `EmailTemplate`
-
-Template admin associe:
-- `src/users/templates/admin/users/product/change_list.html` : toolbar de filtre par categorie.
-
-### Emails et taches
-
-- `src/users/tasks.py`
-  - `send_email`: envoi SMTP HTML via Celery.
-  - `send_djoser_email`: reconstruit les emails Djoser dans le worker.
-- `src/users/emails.py`
-  - `ActivationEmail` et `PasswordResetEmail`: encapsulent le contexte et deleguent a `send_djoser_email`.
-- `src/users/services/activation.py`
-  - `send_activation_email`: action admin pour envoyer un lien d'activation front.
-  - `send_password_email`: reset password via template Djoser.
-- `src/users/signals.py`: handlers de signaux Djoser (actuellement commentes).
-
-### Templates email
-
-- `src/users/templates/email/activation.html`
-- `src/users/templates/email/password_reset.html`
 
 ## App `images`
 

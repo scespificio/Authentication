@@ -155,11 +155,13 @@ export default function LoginPage() {
             >
               Valider
             </Button>
-            <Box textAlign="center">
+
+            {/* Réinitialisation de mot de passe inutilisée */}
+            {/*<Box textAlign="center">
               <ChakraLink asChild>
                 <Link to="/mot-de-passe-oublie">Mot de passe oublié ?</Link>
               </ChakraLink>
-            </Box>
+            </Box>*/}
           </Stack>
         </form>
         <Separator />

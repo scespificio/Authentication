@@ -115,22 +115,22 @@ export class ApiService {
         return response.data;
     }
 
-    async postActivation(uid: string, token: string) {
-        const response = await this.#axiosInstance.post("/users/auth/activation/", { "uid": uid, "token": token });
-        return response.data;
-    }
-    async postResendActivation(email: string) {
-        const response = await this.#axiosInstance.post("/users/auth/resend_activation/", { "email": email });
-        return response.data;
-    }
-    async postResetPassword(uid: string, token: string, new_password: string) { // Inutilisé
-        const response = await this.#axiosInstance.post("/users/auth/users/reset_password_confirm/", { "uid": uid, "token": token, "new_password": new_password });
-        return response.data;
-    }
-    async postPasswordForgotten(email: string) { // Inutilisé
-        const response = await this.#axiosInstance.post("/users/auth/users/reset_password/", { "email": email });
-        return response.data;
-    }
+    /* async postActivation(uid: string, token: string) { // Inutilisé
+         const response = await this.#axiosInstance.post("/users/auth/activation/", { "uid": uid, "token": token });
+         return response.data;
+     }
+     async postResendActivation(email: string) { // Inutilisé
+         const response = await this.#axiosInstance.post("/users/auth/resend_activation/", { "email": email });
+         return response.data;
+     }
+     async postResetPassword(uid: string, token: string, new_password: string) { // Inutilisé
+         const response = await this.#axiosInstance.post("/users/auth/users/reset_password_confirm/", { "uid": uid, "token": token, "new_password": new_password });
+         return response.data;
+     }
+     async postPasswordForgotten(email: string) { // Inutilisé
+         const response = await this.#axiosInstance.post("/users/auth/users/reset_password/", { "email": email });
+         return response.data;
+     }*/
 
     async getUserDomains() {
         const response = await this.#axiosInstance.get("/users/domaine/me/");
