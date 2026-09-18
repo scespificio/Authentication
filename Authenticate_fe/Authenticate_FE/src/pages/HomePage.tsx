@@ -1,5 +1,6 @@
 import Page from "@/components/Page";
 import { useAuth } from "@/hooks/AuthContext";
+import { useDomains } from "@/hooks/DomainContext";
 import {
   Box,
   Button,
@@ -9,57 +10,11 @@ import {
   Image,
   Text,
 } from "@chakra-ui/react";
-import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { useErrorBoundary } from "react-error-boundary";
 import { Navigate } from "react-router";
 
 export default function HomePage() {
-  const { showBoundary } = useErrorBoundary();
-  const { user, tokenRefresh, apiService, logout } = useAuth();
-
-  const [loading, setLoading] = useState<boolean>(true);
-  const [domainsList, setDomainsList] = useState<any[]>([]);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function fetchData() {
-      try {
-        if (!ignore) {
-          setLoading(true);
-
-          const [userRes] = await Promise.all([
-            apiService.getUserDomains(),
-          ]);
-
-          if (!ignore) {
-            setDomainsList(userRes);
-          }
-        }
-      } catch (error) {
-        if (!ignore) {
-          if (error instanceof AxiosError && error.status === 401) {
-            logout();
-          } else {
-            showBoundary(error);
-          }
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    }
-
-    if (user) {
-      fetchData();
-    }
-
-    return () => {
-      ignore = true;
-    };
-  }, [apiService, tokenRefresh, showBoundary, logout, user]);
+  const { user, logout } = useAuth();
+  const domainsList = useDomains();
 
   const DOMAIN_STATUS_ICONS = {
     0: { src: "/images/cercle_vert.png", alt: "Statut : actif" },
@@ -110,7 +65,7 @@ export default function HomePage() {
         </Text>
 
         <Flex direction="column" gap={3}>
-          {domainsList.map((domain) => {
+          {domainsList.domains.map((domain) => {
             const urlFull = `https://${domain.url}`;
             const icon = getDomainStatusIcon(domain.id);
             const domainName = domain.nom.split("/").slice(-1)[0];

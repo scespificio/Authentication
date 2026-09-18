@@ -72,6 +72,10 @@ Un ErrorBoundary global affiche `ErrorPage` en cas d'erreur.
 - Gère les paramètres de recherche, extrait le nom de domaine d'origine depuis l'URL.
 - Expose le nom de domaine d'origine dans la variable `host`
 
+### DomainContext (`Authenticate_fe/src/hooks/DomainContext.tsx`)
+
+- Fetch et expose les noms de domaines et urls autorisés pour l'utilisateur actuellement authentifié.
+
 ## Service API
 
 Fichier: `Authenticate_fe/src/services/api.ts`

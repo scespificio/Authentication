@@ -9,7 +9,6 @@ import { useConfig } from "./ConfigContext";
 interface AuthContextType {
   user?: UserData;
   login: (email: string, password: string, auth: string) => Promise<void>;
-  loginSSO: () => Promise<void>;
   authorize: (host: string) => Promise<void>
   logout: () => void;
   tokenRefresh: () => void;

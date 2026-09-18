@@ -22,3 +22,8 @@ export interface ConfigData {
     }
     chakra?: SystemConfig;
 }
+
+export interface DomainData {
+    nom: string;
+    url: string;
+}

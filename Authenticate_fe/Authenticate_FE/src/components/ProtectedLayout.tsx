@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/AuthContext";
 import { useConfig } from "@/hooks/ConfigContext";
 import {
   Avatar,
-  Badge,
+  Text,
   Box,
   Image,
   Button,
@@ -13,21 +13,19 @@ import {
   Collapsible,
   useCollapsible,
 } from "@chakra-ui/react";
-import { LuMenu, LuList, LuClipboardList } from "react-icons/lu";
-import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { useErrorBoundary } from "react-error-boundary";
+import { LuMenu } from "react-icons/lu";
 import { Link, useLocation } from "react-router";
 import { Loader } from "@/components/Loader";
+import { useDomains } from "@/hooks/DomainContext";
 
 interface Props {
   children: React.ReactNode;
 }
 
 export default function ProtectedLayout(props: Props) {
-  const { showBoundary } = useErrorBoundary();
-  const { user, tokenRefresh, logout, apiService } = useAuth();
+  const { user, logout } = useAuth();
   const { config } = useConfig();
+  const domainsList = useDomains();
   const location = useLocation();
   const collapsible = useCollapsible();
   const appName = import.meta.env.VITE_APP_NAME || "Authenticate";
@@ -40,6 +38,7 @@ export default function ProtectedLayout(props: Props) {
 
   return (
     <>
+
       <title>{`${appName} ${brandName}`}</title>
       <Box background="white">
         <Container height="64px">
@@ -129,6 +128,27 @@ export default function ProtectedLayout(props: Props) {
                   <Link to="/">Accueil</Link>
                 </Box>
               )}
+              {domainsList.domains.map((domain) => {
+                const urlFull = `https://${domain.url}`;
+                const domainName = domain.nom.split("/").slice(-1)[0];
+
+                return (
+                  <>
+                    <Box as="span" color="colorPalette.muted">
+                      |
+                    </Box>
+                    <a
+                      href={urlFull}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Text fontWeight="bold">
+                        {domainName}
+                      </Text>
+                    </a>
+                  </>
+                );
+              })}
             </>
           </Flex>
         </Container>

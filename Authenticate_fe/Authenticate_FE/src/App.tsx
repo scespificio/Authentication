@@ -10,6 +10,7 @@ import ProtectedLayout from "@/components/ProtectedLayout";
 import { ConfigProvider } from "@/hooks/ConfigContext";
 import { AuthProvider } from "@/hooks/AuthContext";
 import { HostProvider } from "./hooks/HostProvider";
+import { DomainProvider } from "@/hooks/DomainContext";
 
 import AccountActivationPage from "@/pages/AccountActivationPage";
 import LoginPage from "@/pages/LoginPage";
@@ -58,11 +59,13 @@ function App() {
                     <Route path="/">
                       <Route
                         element={
-                          <ProtectedRoute>
-                            <ProtectedLayout>
-                              <Outlet />
-                            </ProtectedLayout>
-                          </ProtectedRoute>
+                          <DomainProvider>
+                            <ProtectedRoute>
+                              <ProtectedLayout>
+                                <Outlet />
+                              </ProtectedLayout>
+                            </ProtectedRoute>
+                          </DomainProvider>
                         }
                       >
                         <Route index element={<HomePage />} />
