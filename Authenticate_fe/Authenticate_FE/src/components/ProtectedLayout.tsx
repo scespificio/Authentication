@@ -33,6 +33,7 @@ export default function ProtectedLayout(props: Props) {
   const appName = import.meta.env.VITE_APP_NAME || "Authenticate";
   const brandName = config?.appName || "Authenticate";
 
+  console.log("CONFIG !", config)
   if (!config) {
     return <Loader />;
   }

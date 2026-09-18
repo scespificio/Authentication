@@ -12,6 +12,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 
 THUMB_HEIGHT = 60
 
+
 def render_thumb(filefield, height=THUMB_HEIGHT):
     if not filefield:
         return "—"
@@ -19,7 +20,11 @@ def render_thumb(filefield, height=THUMB_HEIGHT):
         url = filefield.url
     except Exception:
         return "—"
-    return format_html('<img src="{}" style="height:{}px;width:auto;border-radius:6px;" />', url, height)
+    return format_html(
+        '<img src="{}" style="height:{}px;width:auto;border-radius:6px;" />',
+        url,
+        height,
+    )
 
 
 @admin.register(Image)
@@ -35,26 +40,31 @@ class ImageAdmin(admin.ModelAdmin):
         # Chemin relatif au répertoire STATIC (collectstatic/finders)
         js = ("image/image_title_autofill.js",)
 
-    change_list_template = "admin/images/image/change_list.html" 
+    change_list_template = "admin/images/image/change_list.html"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.prefetch_related("taggings__tag")  # précharge les tags
-       
+
     @admin.display(description="Tags")
     def tags_list(self, obj):
-        return ", ".join(
-            obj.taggings.all().select_related("tag").values_list("tag__label", flat=True)
-        ) or "—"
+        return (
+            ", ".join(
+                obj.taggings.all()
+                .select_related("tag")
+                .values_list("tag__label", flat=True)
+            )
+            or "—"
+        )
 
     @admin.display(description="Aperçu")
     def thumb(self, obj):
         return render_thumb(obj.image_file)
-    
+
     @admin.display(description="Prévisualisation")
     def preview(self, obj):
         return render_thumb(obj.image_file, height=400)
-    
+
     # 1) Vue custom — IMPÉRATIF: doit être une méthode d'instance: (self, request)
     def batch_upload_view(self, request):
         opts = self.model._meta
@@ -78,14 +88,18 @@ class ImageAdmin(admin.ModelAdmin):
                     self.model.objects.create(title=title, image_file=f)
                     created += 1
 
-                messages.success(request, f"{created} image(s) importée(s) avec succès.")
+                messages.success(
+                    request, f"{created} image(s) importée(s) avec succès."
+                )
                 url = reverse(f"admin:{opts.app_label}_{opts.model_name}_changelist")
                 return HttpResponseRedirect(url)
         else:
             context["form"] = BatchImageUploadForm()
 
-        return TemplateResponse(request, "admin/images/image/batch_upload.html", context)
-    
+        return TemplateResponse(
+            request, "admin/images/image/batch_upload.html", context
+        )
+
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [

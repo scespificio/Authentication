@@ -51,7 +51,7 @@ export class ApiService {
     }
 
     async authorize(host: string) {
-        const response = await this.#axiosInstance.get("/core/auth/authorize/", { headers: { "X-Requested-Host": host } });
+        const response = await this.#axiosInstance.get("/users/auth/authorize/", { headers: { "X-Requested-Host": host } });
         return response.data;
     }
 
@@ -110,7 +110,8 @@ export class ApiService {
     }
 
     async getConfig(): Promise<ConfigData> {
-        const response = await this.#axiosInstance.get("/core/theme/me/");
+        const response = await this.#axiosInstance.get("/core/theme/");
+        console.log("HERES THE CONFIG", response)
         return response.data;
     }
 
@@ -132,7 +133,7 @@ export class ApiService {
     }
 
     async getUserDomains() {
-        const response = await this.#axiosInstance.get("/core/domaine/me/");
+        const response = await this.#axiosInstance.get("/users/domaine/me/");
         return response.data;
     }
 
