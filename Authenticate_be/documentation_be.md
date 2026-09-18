@@ -11,7 +11,7 @@ Ce document décrit le code present dans `Authenticate_be`. Il couvre l'architec
 ```
 Authenticate_be/
 │
-├── Authenticate/
+├── src/
 │   └── config/           <- configuration Django (settings, urls, wsgi/asgi, celery).
 │   └── core/             <- gestion des profils & domaines, services.
 │       └── migrations/
@@ -42,12 +42,12 @@ Authenticate_be/
 
 ## Configuration Django (Authenticate)
 
-Fichier: `Authenticate/config/settings.py`
+Fichier: `src/config/settings.py`
 
 - DRF: JWT obligatoire par defaut, renderer JSON en prod.
 - Djoser: activation + reset password custom via `users.emails`.
 - Static: `STATIC_ROOT=staticfiles` et `STATICFILES_STORAGE=whitenoise`.
-- Media: `MEDIA_URL=/uploads/`, `MEDIA_ROOT=Authenticate/uploads`.
+- Media: `MEDIA_URL=/uploads/`, `MEDIA_ROOT=src/uploads`.
 - Celery: `CELERY_BROKER_URL` (Redis) et `CELERY_RESULT_BACKEND`.
 - Logging standard console.
 - Sécurité: `SECURE_SSL_REDIRECT`, `SECURE_PROXY_SSL_HEADER`, `CSRF_TRUSTED_ORIGINS`.
@@ -68,18 +68,18 @@ Variables d'environnement (principales):
 
 ## URLs et endpoints
 
-URLConf actif (celui reference dans settings): `Authenticate/config/urls.py`
+URLConf actif (celui reference dans settings): `src/config/urls.py`
 
 Routes principales:
 
 - Admin: `/admin/`
-- core API, domain authorization, JWT check (custom): `/core/` (voir `Authenticate/core/urls.py`)
+- core API, domain authorization, JWT check (custom): `/core/` (voir `src/core/urls.py`)
 - djoser authentication, JWT creation (custom) : 
   - `/users/auth/`
 - Debug toolbar: `/__debug__/` (en dev)
 - Media: expose en dev via `static()` si `DEBUG=True`
 
-Endpoints core (`Authenticate/core/urls.py`):
+Endpoints core (`src/core/urls.py`):
 
 ```
 core/
@@ -112,21 +112,21 @@ users/
           └── create/
 ```
 
-### Services (`Authenticate/core/services.py`)
+### Services (`src/core/services.py`)
 
 - `user_has_domain_access` : Vérifie si l'utilisateur a accès au domaine.
 
-### Models (`Authenticate/core/models.py`)
+### Models (`src/core/models.py`)
 
 - `ProfilUtilisateur`: . Champs:  `nom`, `utilisateur` (FK vers `User`), `domaines` (FK ManyToMany vers `Domaine`)
 - `Domaine`: Champs: `nom`, `url`.
 
-### Serializers (`Authenticate/core/serializers.py`)
+### Serializers (`src/core/serializers.py`)
 
 - `DomainSerializer`: informations de base sur le domaine.
 - `ProfileSerializer`: informations de base sur le profil utilisateur.
 
-### Views (`Authenticate/core/views.py`)
+### Views (`src/core/views.py`)
 
 - `ProfileView`: renvoie les informations sur les profils utilisateurs.
 - `ProfileViewDetail`: renvoie les informations sur les profils utilisateur associés à l'utilisateur actuellement connecté.
@@ -135,84 +135,84 @@ users/
 - `AuthorizeView`: vérifie que l'utilisateur est autorisé pour le domaine demandé.
 - `CheckCookieView`: vérifie que le JWT reçu est valide et appartient à un utilisateur autorisé pour le domaine dont provient la demande.
 
-### Admin (`Authenticate/core/admin.py`)
+### Admin (`src/core/admin.py`)
 
 - Admin `ProfilUtilisateur`
 - Admin `Domaine`
 
 ## App `users`
 
-### Models (`Authenticate/users/models.py`)
+### Models (`src/users/models.py`)
 
 - `User`: remplace `username` par `email` (auth). Champs: `is_staff`, `is_superuser`
 - `EmailTemplate`: modèle d'email (title, content, footer, description).
 
-### Serializers (`Authenticate/users/serializers.py`)
+### Serializers (`src/users/serializers.py`)
 
 - `UserCreateSerializer`, `UserSerializer`: base Djoser adaptee a l'email 
 - `CustomTokenObtainPairSerializer`: login JWT qui renvoie le users et les tokens : contourne la fonction django validate() ; utilise `USERS_LOGIN_FIELD` pour déterminer le champ utilisateur. Quand `USERS_LOGIN_FIELD = "both"`, cherche une correspondence sur les deux champs `username` et `email`.
 
-### Views (`Authenticate/users/views.py`)
+### Views (`src/users/views.py`)
 
 - `CustomTokenObtainPairView`: endpoint JWT custom : implémente manuellement le throttling et dépend de `DEFAULT_THROTTLE_RATES`.
 - `ActivationView`: active un compte et envoie un email de reset mot de passe.
 - `ActivationResendView`: renvoie un lien d'activation.
 
-### Admin (`Authenticate/users/admin.py`)
+### Admin (`src/users/admin.py`)
 
 - Custom admin pour `User` (login email) + action "Envoyer un e-mail d'activation".
 - Admin `EmailTemplate`
 
 Template admin associe:
-- `Authenticate/users/templates/admin/users/product/change_list.html` : toolbar de filtre par categorie.
+- `src/users/templates/admin/users/product/change_list.html` : toolbar de filtre par categorie.
 
 ### Emails et taches
 
-- `Authenticate/users/tasks.py`
+- `src/users/tasks.py`
   - `send_email`: envoi SMTP HTML via Celery.
   - `send_djoser_email`: reconstruit les emails Djoser dans le worker.
-- `Authenticate/users/emails.py`
+- `src/users/emails.py`
   - `ActivationEmail` et `PasswordResetEmail`: encapsulent le contexte et deleguent a `send_djoser_email`.
-- `Authenticate/users/services/activation.py`
+- `src/users/services/activation.py`
   - `send_activation_email`: action admin pour envoyer un lien d'activation front.
   - `send_password_email`: reset password via template Djoser.
-- `Authenticate/users/signals.py`: handlers de signaux Djoser (actuellement commentes).
+- `src/users/signals.py`: handlers de signaux Djoser (actuellement commentes).
 
 ### Templates email
 
-- `Authenticate/users/templates/email/activation.html`
-- `Authenticate/users/templates/email/password_reset.html`
+- `src/users/templates/email/activation.html`
+- `src/users/templates/email/password_reset.html`
 
 ## App `images`
 
 **N'est pas utilisée actuellement.**
 
-### Models (`Authenticate/images/models.py`)
+### Models (`src/images/models.py`)
 
 - `Image`: fichier image et tags (GenericRelation via `TaggedItem`).
 - `ImageItem`: associe une image a n'importe quel objet (GenericForeignKey), avec `display_order`.
 
-### Serializers (`Authenticate/images/serializers.py`)
+### Serializers (`src/images/serializers.py`)
 
 - `ImageSerializer`: meta simple.
 - `ImageItemSerializer`: expose image en lecture et image_id en ecriture.
 
 ### Admin et upload en lot
 
-- `Authenticate/images/admin.py`
+- `src/images/admin.py`
   - `ImageAdmin`: liste avec preview, tags, et import en lot.
   - `batch_upload_view`: page custom pour importer plusieurs images.
 - Formulaires:
-  - `Authenticate/images/forms.py`: `BatchImageUploadForm` + gestion multi-fichiers.
-  - `Authenticate/images/widgets.py`: `MultiFileWidget`.
+  - `src/images/forms.py`: `BatchImageUploadForm` + gestion multi-fichiers.
+  - `src/images/widgets.py`: `MultiFileWidget`.
 - JS admin:
-  - `Authenticate/images/static/image/image_title_autofill.js`: autofill du titre a partir du nom de fichier.
+  - `src/images/static/image/image_title_autofill.js`: autofill du titre a partir du nom de fichier.
 - Template admin:
-  - `Authenticate/images/templates/admin/images/image/batch_upload.html`
+  - `src/images/templates/admin/images/image/batch_upload.html`
 
 ## Celery
 
-Fichier: `Authenticate/config/celery.py`
+Fichier: `src/config/celery.py`
 
 - Initialise Celery avec `DJANGO_SETTINGS_MODULE=config.settings`.
 - Autodiscover des taches (`users.tasks`).
@@ -235,8 +235,8 @@ Ports connus (README):
 
 ## Points d'entree
 
-- `Authenticate/manage.py`: CLI Django.
-- `Authenticate/config/asgi.py` et `Authenticate/config/wsgi.py`: serveurs ASGI/WSGI.
+- `src/manage.py`: CLI Django.
+- `src/config/asgi.py` et `src/config/wsgi.py`: serveurs ASGI/WSGI.
 
 ## Tests
 
