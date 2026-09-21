@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function DomainProvider(props: Props) {
-    const { user, apiService } = useAuth();
+    const { user, apiService, tokenRefresh } = useAuth();
     const { showBoundary } = useErrorBoundary();
 
     const [loading, setLoading] = useState(true);
@@ -35,7 +35,9 @@ export function DomainProvider(props: Props) {
                 let response = await apiService.getUserDomains();
                 setDomains(response)
             } catch (error: any) {
-                if (error instanceof AxiosError && error.status === 401) {
+                if (error instanceof AxiosError && error.response?.status === 401) { // refresh if token expired
+                    tokenRefresh();
+                } else {
                     showBoundary(error);
                 }
             } finally {
@@ -43,7 +45,7 @@ export function DomainProvider(props: Props) {
             }
         }
         fetchData();
-    }, [user]);
+    }, [user, apiService, tokenRefresh]);
 
     const value: DomainContextType = {
         domains: domains,

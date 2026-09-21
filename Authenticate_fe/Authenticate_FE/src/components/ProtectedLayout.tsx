@@ -142,7 +142,7 @@ export default function ProtectedLayout(props: Props) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Text fontWeight="bold">
+                      <Text >
                         {domainName}
                       </Text>
                     </a>
