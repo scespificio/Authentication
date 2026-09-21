@@ -1,4 +1,3 @@
-from core.models import Domain, UserIAM
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import Group
@@ -41,25 +40,3 @@ def get_app_list(request, app_label=None):
 
 
 admin.site.get_app_list = get_app_list
-
-
-@admin.register(UserIAM)
-class UserIAMAdmin(admin.ModelAdmin):
-    list_display = ("user_email", "user_username")
-    ordering = ("-id",)
-    filter_horizontal = ("domaines",)
-
-    @admin.display(description="Email", ordering="user__email")
-    def user_email(self, obj):
-        return obj.user.email
-
-    @admin.display(description="Utilisateur", ordering="user__username")
-    def user_username(self, obj):
-        return obj.user.username
-
-
-@admin.register(Domain)
-class DomainAdmin(admin.ModelAdmin):
-    list_display = ("nom", "url")
-    ordering = ("-id",)
-    search_fields = ("nom", "url")

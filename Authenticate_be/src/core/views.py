@@ -1,11 +1,15 @@
 import json
 import os
+<<<<<<< HEAD
 from typing import ClassVar
+=======
+>>>>>>> origin/SSO
 
 from django.conf import settings
 from dotenv import load_dotenv
 from rest_framework import permissions, status
 from rest_framework.decorators import action
+<<<<<<< HEAD
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response
@@ -17,17 +21,29 @@ from users.models import User
 from .models import Domain, UserIAM
 from .serializers import DomainSerializer, ProfileSerializer
 from .services import user_has_domain_access
+=======
+from rest_framework.response import Response
+from rest_framework.viewsets import ReadOnlyModelViewSet
+>>>>>>> origin/SSO
 
 load_dotenv()
 
 CONFIG_FOLDER = os.getenv("CONFIG_FILE_FOLDER")
 CONFIG_FILE = os.getenv("CONFIG_FILE_NAME")
+<<<<<<< HEAD
 
 
 class ConfigDetailView(ReadOnlyModelViewSet):
     permission_classes: ClassVar[list[type[BasePermission]]] = [
         permissions.IsAuthenticated
     ]
+=======
+DOMAIN_NAME = os.getenv("DOMAIN_NAME")
+
+
+class ConfigDetailView(ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+>>>>>>> origin/SSO
     # serializer_class = WebConfigOutputSerializer
     # pas de listing; on garde select_related pour éviter les N+1
     # queryset = WebConfig.objects.select_related("emailTemplate", "ui_template").none()
@@ -46,6 +62,7 @@ class ConfigDetailView(ReadOnlyModelViewSet):
             data = json.load(f)
 
         return Response(data, status=status.HTTP_200_OK)
+<<<<<<< HEAD
 
 
 class ProfileView(GenericAPIView):  # GET all
@@ -197,3 +214,5 @@ class CheckCookieView(GenericAPIView):
             return Response(
                 {"error": "Requête invalide."}, status=status.HTTP_400_BAD_REQUEST
             )
+=======
+>>>>>>> origin/SSO

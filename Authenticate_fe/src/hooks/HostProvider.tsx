@@ -1,6 +1,5 @@
 import { Loader } from "@/components/Loader";
-import { toaster } from "@/components/ui/toaster";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router";
 
 

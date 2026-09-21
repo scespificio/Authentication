@@ -101,6 +101,9 @@ docker-compose.override.yml
 *.crt
 *.tgz
 
+# Ignore reset bsh files
+reset_*.sh
+
 # ==========================
 # Local tooling
 # ==========================

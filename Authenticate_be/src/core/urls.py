@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 from django.urls import path  # noqa: EXE002
 from rest_framework import routers
+=======
+from django.urls import path
+>>>>>>> origin/SSO
 
 from . import views
 
 app_name = "core"
 
+<<<<<<< HEAD
 router = routers.DefaultRouter()
 router.register(r"theme", views.ConfigDetailView, basename="theme")
 
@@ -16,3 +21,8 @@ urlpatterns = [
     path("auth/authorize/", views.AuthorizeView.as_view(), name="autorisation"),
     path("auth/jwt/check/", views.CheckCookieView.as_view(), name="check-jwt-cookie"),
 ] + router.urls
+=======
+urlpatterns = [
+    path("theme/", views.ConfigDetailView.as_view({"get": "me"})),
+]
+>>>>>>> origin/SSO
